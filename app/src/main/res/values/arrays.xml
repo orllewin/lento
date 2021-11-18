@@ -1,0 +1,11 @@
+<resources>
+    <string-array name="letterbox_colour_entries">
+        <item>Black</item>
+        <item>White</item>
+    </string-array>
+
+    <string-array name="letterbox_colour_values">
+        <item>black</item>
+        <item>white</item>
+    </string-array>
+</resources>

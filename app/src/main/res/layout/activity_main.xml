@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    android:background="@color/eigenlicht"
+    tools:context=".MainActivity">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/camerax_view_finder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:backgroundTint="@color/black"
+        app:scaleType="fitCenter"
+        android:scaleX="1.33" />
+
+    <View
+        android:id="@+id/shutter"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="@color/black" />
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/preview_image_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="8dp"
+        app:cardUseCompatPadding="true"
+        android:layout_margin="24dp"
+        android:layout_alignParentBottom="true"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        android:layout_alignParentEnd="true">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/preview_image"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            tools:layout_height="100dp"
+            android:background="@android:color/transparent"
+            android:adjustViewBounds="true"/>
+
+    </androidx.cardview.widget.CardView>
+
+
+    <RelativeLayout
+        android:id="@+id/camera_buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="60dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true">
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/camera_outer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/camera_outer"
+            android:layout_centerInParent="true"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/camera_inner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/camera_inner"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/overflow"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/menu"
+        android:src="@drawable/vector_overflow"
+        android:tint="@color/white"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <RelativeLayout
+        android:id="@+id/flash_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/zoom_container"
+        android:layout_marginStart="@dimen/control_left_padding"
+        android:layout_marginBottom="4dp">
+
+        <RelativeLayout
+            android:id="@+id/flash_layout"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:backgroundTint="@color/white"
+            android:background="?android:attr/selectableItemBackgroundBorderless">
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/flash_inner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/vector_flash_on"
+                android:tint="@color/white" />
+
+        </RelativeLayout>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/flash_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/flash_layout"
+            android:layout_centerVertical="true"
+            app:singleLine="true"
+            app:singleSelection="true"
+            android:visibility="gone"
+            app:selectionRequired="true"
+            app:checkedChip="@+id/chip_flash_off">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_flash_off"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="Flash off" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_flash_on"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="Flash on" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_flash_auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="Flash Auto" />
+        </com.google.android.material.chip.ChipGroup>
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/zoom_container"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_container_height"
+        android:layout_above="@+id/aspect_ratio_container"
+        android:layout_marginStart="@dimen/control_left_padding"
+        android:layout_marginBottom="4dp">
+
+        <RelativeLayout
+            android:id="@+id/zoom_layout"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/zoom_inner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/vector_zoom_in"
+                android:tint="@color/white" />
+
+        </RelativeLayout>
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/zoom_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/zoom_layout"
+            android:text="1x"
+            android:paddingStart="8dp"
+            android:layout_centerVertical="true"
+            android:textColor="@color/white"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/aspect_ratio_container"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_container_height"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="@dimen/control_left_padding"
+        android:layout_marginBottom="24dp">
+
+        <RelativeLayout
+            android:id="@+id/aspect_ratio_layout"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:clickable="true"
+            android:focusable="true">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/aspect_ratio_inner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/vector_aspect_ratio"
+                android:tint="@color/white" />
+
+        </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/aspect_ratio_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/aspect_ratio_layout"
+            android:text="16:9"
+            android:paddingStart="8dp"
+            android:layout_centerVertical="true"
+            android:textColor="@color/white"/>
+
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>
