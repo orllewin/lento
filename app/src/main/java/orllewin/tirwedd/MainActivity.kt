@@ -30,9 +30,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.preference.PreferenceManager
 import oppen.stracka.AnimationEndListener
-import orllewin.extensions.hide
-import orllewin.extensions.mainThread
-import orllewin.extensions.show
+import orllewin.extensions.*
 import orllewin.file_io.CameraIO
 import orllewin.file_io.OppenFileIO
 import orllewin.tirwedd.databinding.ActivityMainBinding
@@ -84,9 +82,10 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
                 true
             }
-            val aboutItem = popup.menu.add("About")
-            aboutItem.setOnMenuItemClickListener {
-                //todo
+
+            val quitItem = popup.menu.add("Quit")
+            quitItem.setOnMenuItemClickListener {
+                this@MainActivity.finishAffinity()
                 true
             }
 
@@ -351,6 +350,11 @@ class MainActivity : AppCompatActivity() {
 
         val scaleFactor = PreferenceManager.getDefaultSharedPreferences(this).getString("horizontal_scale_factor", "1.33")!!.toFloat()
         binding.cameraxViewFinder.scaleX = scaleFactor
+
+        if(getBooleanPref("is_first_run", true)){
+            putBooleanPref("is_first_run", false)
+            FirstRunDialog(this).show()
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

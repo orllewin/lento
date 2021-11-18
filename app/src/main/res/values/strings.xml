@@ -15,4 +15,6 @@
     <string name="horizontal_scale_factor">Horizontal scale factor</string>
     <string name="export">Add to Photos</string>
     <string name="menu">Menu</string>
+    <string name="disclaimer_button">I understand</string>
+    <string name="disclaimer">Tirwedd \'desqueezes\' photos taken with a hardware anamorphic lens attached, it\'s not a general use camera app and will distort images if there\'s no lens attached. If you purchased Tirwedd in error please request a refund immediately</string>
 </resources>

@@ -203,7 +203,7 @@ fun Context.getBooleanPref(key: String, default: Boolean): Boolean{
     return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(key, default)
 }
 
-fun Context.setBooleanPref(key: String, value: Boolean) {
+fun Context.putBooleanPref(key: String, value: Boolean) {
     PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(key, value).apply()
 }
 
