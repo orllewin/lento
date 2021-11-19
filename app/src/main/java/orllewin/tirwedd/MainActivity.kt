@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
 
-            val cameraItem = popup.menu.add("Switch to default camera")
+            val cameraItem = popup.menu.add("Switch camera")
             cameraItem.setOnMenuItemClickListener {
                 val intent = Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA)
                 startActivity(intent)
