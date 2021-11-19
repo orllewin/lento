@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
                     viewModel.takePhotoStateFlow.asStateFlow().collect { captureTrigger ->
                         if (captureTrigger) {
                             binding.previewProgress.show()
-                            shutter()
+                            binding.shutter.activate()
                             binding.cameraInner.animate().scaleXBy(0.2f).scaleYBy(0.2f)
                                 .setDuration(250).withEndAction {
                                     binding.cameraInner.scaleX = 1f
@@ -124,30 +124,7 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.putImageProcessor(imageProcessor)
 
-        binding.overflow.setOnClickListener {
-            val popup = PopupMenu(this@MainActivity, binding.overflow)
-
-            val settingsItem = popup.menu.add("Settings")
-            settingsItem.setOnMenuItemClickListener {
-                startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
-                true
-            }
-
-            val cameraItem = popup.menu.add("Switch camera")
-            cameraItem.setOnMenuItemClickListener {
-                val intent = Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA)
-                startActivity(intent)
-                true
-            }
-
-            val quitItem = popup.menu.add("Quit")
-            quitItem.setOnMenuItemClickListener {
-                this@MainActivity.finishAffinity()
-                true
-            }
-
-            popup.show()
-        }
+        binding.overflow.setOnClickListener { OverflowMenu(this, binding.overflow).show() }
 
         binding.zoomLayout.setOnClickListener {
             zoomRatio = when (zoomRatio) {
@@ -321,21 +298,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun shutter(){
-        binding.shutter.alpha = 0f
-        binding.shutter.show()
-
-        binding.shutter.animate().alpha(1f).setDuration(50L).setListener(AnimationEndListener{
-            hideShutter()
-        }).start()
-    }
-
-    private fun hideShutter(){
-        binding.shutter.animate().alpha(1f).setDuration(100L).setListener(AnimationEndListener{
-            binding.shutter.hide()
-        }).start()
     }
 
     @SuppressLint("ClickableViewAccessibility")
