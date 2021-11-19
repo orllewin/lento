@@ -43,6 +43,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
 
     implementation project(path: ':modules:extensions')
     implementation project(path: ':modules:file_io')

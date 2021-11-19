@@ -18,6 +18,8 @@ import android.graphics.Paint
 import android.os.Build
 import android.view.KeyEvent
 import android.view.MotionEvent
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.widget.PopupMenu
 import androidx.camera.core.*
 import androidx.camera.core.AspectRatio.RATIO_16_9
@@ -28,7 +30,13 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.PreferenceManager
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import oppen.stracka.AnimationEndListener
 import orllewin.extensions.*
 import orllewin.file_io.CameraIO
@@ -41,6 +49,7 @@ import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
 
+    private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
     private lateinit var cacheFile: File
 
@@ -48,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
     private var fileIO = OppenFileIO()
     private var cameraIO = CameraIO()
-    private lateinit var imageProcessor: TirweddImageProcessor
+    private lateinit var imageProcessor: AnamorphicPhotoProcessor
 
     private var uri: Uri? = null
     private var bitmap: Bitmap? = null
@@ -60,7 +69,6 @@ class MainActivity : AppCompatActivity() {
     private var camera: Camera? = null
     private var zoomRatio = 1f
 
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,10 +77,31 @@ class MainActivity : AppCompatActivity() {
 
         fileIO.register(this)
         cameraIO.register(this)
-        imageProcessor = TirweddImageProcessor(lifecycleScope)
+        imageProcessor = AnamorphicPhotoProcessor(this, lifecycleScope)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                imageProcessor.exportedPreviewStateFlow.asStateFlow().collect { preview ->
+                    preview?.let{
+                        mainThread {
+                            uri = preview.first
+                            binding.previewImage.setImageBitmap(preview.second)
+                        }
+                    }
+                }
+
+                imageProcessor.errorStateFlow.asStateFlow().collect { error ->
+                    error?.let {
+                        mainThread {
+                            Toast.makeText(this@MainActivity, error, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        }
 
         binding.overflow.setOnClickListener {
             val popup = PopupMenu(this@MainActivity, binding.overflow)
@@ -99,7 +128,8 @@ class MainActivity : AppCompatActivity() {
                 binding.cameraInner.scaleY = 1f
             } .start()
 
-            capturePhoto()
+            shutter()
+            imageProcessor.capturePhoto()
         }
 
         binding.zoomLayout.setOnClickListener {
@@ -119,7 +149,6 @@ class MainActivity : AppCompatActivity() {
             camera?.cameraControl?.setZoomRatio(zoomRatio)
             autoFocus(null)
         }
-
 
         binding.cameraxViewFinder.setOnTouchListener { view, motionEvent ->
             autoFocus(motionEvent)
@@ -146,17 +175,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun createCacheFile(): File?{
-        return when (val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)) {
-            null -> null
-            else -> {
-                File.createTempFile("stracka_temp_capture", ".jpg", storageDir).apply {
-                    cacheFile = this
-                }
-            }
-        }
-    }
-
     private fun requestFileIOPermissions(){
         fileIO.requestPermissions { granted ->
             when {
@@ -176,72 +194,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun snack(message: String) = Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
-
-    private fun exportImage(image: Bitmap, onExported: (uri: Uri?, error: String?) -> Unit){
-
-        val values = ContentValues()
-
-        val now = OffsetDateTime.now()
-        val filename = "stracka_desqueezed_${now.toEpochSecond()}.jpg"
-
-        values.put(MediaStore.Images.Media.TITLE, filename)
-        values.put(MediaStore.Images.Media.DISPLAY_NAME, filename)
-        values.put(MediaStore.Images.Media.DATE_ADDED, now.toEpochSecond())
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Oppen")
-            values.put(MediaStore.Images.Media.IS_PENDING, true)
-        }
-
-        val collection = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-            else -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        }
-
-        uri = this.contentResolver.insert(collection, values)
-
-        uri?.let {
-            val useLetterbox = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("use_letterbox", false)
-            when {
-                useLetterbox -> {
-                    val bitmapWidth = image.width
-                    val bitmapHeight = image.height
-                    val frameHeight = (bitmapWidth/16) * 9
-                    val letterBoxed = Bitmap.createBitmap(bitmapWidth, frameHeight, Bitmap.Config.ARGB_8888)
-                    val canvas = Canvas(letterBoxed)
-                    when (PreferenceManager.getDefaultSharedPreferences(this).getString("letterbox_colour", "black")) {
-                        "black" -> canvas.drawColor(Color.BLACK)
-                        else -> canvas.drawColor(Color.WHITE)
-                    }
-                    canvas.drawBitmap(image, 0f, (frameHeight - bitmapHeight)/2f, Paint())
-                    this.contentResolver.openOutputStream(uri!!)?.use { outputStream ->
-                        outputStream.use { os ->
-                            letterBoxed.compress(Bitmap.CompressFormat.JPEG, 100, os)
-                        }
-                    }
-                    letterBoxed.recycle()
-                }
-                else -> {
-                    this.contentResolver.openOutputStream(uri!!)?.use { outputStream ->
-                        outputStream.use { os ->
-                            image.compress(Bitmap.CompressFormat.JPEG, 100, os)
-                        }
-                    }
-                }
-            }
-
-            values.clear()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                values.put(MediaStore.Images.Media.IS_PENDING, false)
-                this.contentResolver.update(uri!!, values, null, null)
-            }
-
-            onExported(uri, null)
-        } ?: run {
-            onExported(null, "MediaStore error: could not export image")
-        }
-    }
 
     private fun toggleAspectRatio(){
         aspectRatio = when (aspectRatio) {
@@ -268,6 +220,8 @@ class MainActivity : AppCompatActivity() {
                 .setTargetAspectRatio(aspectRatio)
                 .build()
 
+            imageProcessor.setup(imageCapture)
+
             imageCapture?.flashMode = ImageCapture.FLASH_MODE_OFF
 
             when(aspectRatio){
@@ -287,55 +241,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }, ContextCompat.getMainExecutor(this))
-    }
-
-    private fun capturePhoto(){
-        //Shutter flash
-        shutter()
-
-        val imageCapture = imageCapture ?: return
-        val cacheFile = createCacheFile()
-
-        if(cacheFile == null){
-            snack("Could not create cache file for photo")
-            return
-        }
-
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(cacheFile).build()
-        imageCapture.takePicture(
-            outputOptions, ContextCompat.getMainExecutor(this), object : ImageCapture.OnImageSavedCallback {
-                override fun onError(exc: ImageCaptureException) {
-                    println("Stracka cameraX capture exception: ${exc.message}")
-                }
-
-                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    println("Stracka cameraX image saved, processing image")
-                    processCacheFile()
-                }
-            })
-    }
-
-    private fun processCacheFile(){
-
-        val scaleFactor = PreferenceManager.getDefaultSharedPreferences(this).getString("horizontal_scale_factor", "1.33")!!.toFloat()
-        val useNativeToolkit = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("use_native_toolkit", true)
-
-        imageProcessor.processBitmap(cacheFile, scaleFactor, useNativeToolkit) { scaledBitmap ->
-            mainThread {
-                bitmap = scaledBitmap
-                bitmap?.let{
-                    binding.previewImage.setImageBitmap(bitmap)
-
-                    exportImage(bitmap!!){ uri,  error ->
-                        when {
-                            error != null -> println("Stracka save capture error: $error")
-                            else -> println("Stracka save capture uri: $uri")
-                        }
-                    }
-                }
-
-            }
-        }
     }
 
     override fun onResume() {
@@ -360,7 +265,8 @@ class MainActivity : AppCompatActivity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         return when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN -> {
-                capturePhoto()
+                shutter()
+                imageProcessor.capturePhoto()
                 true
             }
             else -> super.onKeyDown(keyCode, event)
