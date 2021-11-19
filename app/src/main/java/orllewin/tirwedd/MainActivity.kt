@@ -51,7 +51,6 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
-    private lateinit var cacheFile: File
 
     private var aspectRatio = RATIO_16_9
 
@@ -60,7 +59,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageProcessor: AnamorphicPhotoProcessor
 
     private var uri: Uri? = null
-    private var bitmap: Bitmap? = null
 
     //CameraX
     private var imageCapture: ImageCapture? = null
@@ -80,28 +78,51 @@ class MainActivity : AppCompatActivity() {
         imageProcessor = AnamorphicPhotoProcessor(this, lifecycleScope)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
+        binding.viewmodel = viewModel
         setContentView(binding.root)
 
         lifecycleScope.launch {
+
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                imageProcessor.exportedPreviewStateFlow.asStateFlow().collect { preview ->
-                    preview?.let{
-                        mainThread {
-                            uri = preview.first
-                            binding.previewImage.setImageBitmap(preview.second)
+                launch {
+                    viewModel.takePhotoStateFlow.asStateFlow().collect { captureTrigger ->
+                        if (captureTrigger) {
+                            binding.previewProgress.show()
+                            shutter()
+                            binding.cameraInner.animate().scaleXBy(0.2f).scaleYBy(0.2f)
+                                .setDuration(250).withEndAction {
+                                    binding.cameraInner.scaleX = 1f
+                                    binding.cameraInner.scaleY = 1f
+                                }.start()
                         }
                     }
                 }
 
-                imageProcessor.errorStateFlow.asStateFlow().collect { error ->
-                    error?.let {
-                        mainThread {
-                            Toast.makeText(this@MainActivity, error, Toast.LENGTH_SHORT).show()
+                launch{
+                    imageProcessor.exportedPreviewStateFlow.asStateFlow().collect { preview ->
+                        preview?.let {
+                            mainThread {
+                                uri = preview.first
+                                binding.previewImage.setImageBitmap(preview.second)
+                                binding.previewProgress.hide()
+                            }
+                        }
+                    }
+                }
+
+                launch{
+                    imageProcessor.errorStateFlow.asStateFlow().collect { error ->
+                        error?.let {
+                            mainThread {
+                                Toast.makeText(this@MainActivity, error, Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }
             }
         }
+
+        viewModel.putImageProcessor(imageProcessor)
 
         binding.overflow.setOnClickListener {
             val popup = PopupMenu(this@MainActivity, binding.overflow)
@@ -119,17 +140,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             popup.show()
-        }
-
-        binding.cameraInner.setOnClickListener {
-
-            binding.cameraInner.animate().scaleXBy(0.2f).scaleYBy(0.2f).setDuration(250).withEndAction {
-                binding.cameraInner.scaleX = 1f
-                binding.cameraInner.scaleY = 1f
-            } .start()
-
-            shutter()
-            imageProcessor.capturePhoto()
         }
 
         binding.zoomLayout.setOnClickListener {
@@ -265,8 +275,7 @@ class MainActivity : AppCompatActivity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         return when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN -> {
-                shutter()
-                imageProcessor.capturePhoto()
+                viewModel.capturePhoto()
                 true
             }
             else -> super.onKeyDown(keyCode, event)
