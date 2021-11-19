@@ -5,22 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import android.content.ContentValues
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.os.Build
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.widget.PopupMenu
 import androidx.camera.core.*
 import androidx.camera.core.AspectRatio.RATIO_16_9
 import androidx.camera.core.AspectRatio.RATIO_4_3
@@ -35,17 +24,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import oppen.stracka.AnimationEndListener
 import orllewin.extensions.*
 import orllewin.file_io.CameraIO
 import orllewin.file_io.OppenFileIO
 import orllewin.tirwedd.databinding.ActivityMainBinding
-import java.time.OffsetDateTime
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -60,7 +45,6 @@ class MainActivity : AppCompatActivity() {
 
     private var uri: Uri? = null
 
-    //CameraX
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraExecutor: ExecutorService
 
@@ -112,11 +96,7 @@ class MainActivity : AppCompatActivity() {
 
                 launch{
                     imageProcessor.errorStateFlow.asStateFlow().collect { error ->
-                        error?.let {
-                            mainThread {
-                                Toast.makeText(this@MainActivity, error, Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                        toast(error)
                     }
                 }
             }
@@ -173,7 +153,7 @@ class MainActivity : AppCompatActivity() {
         fileIO.requestPermissions { granted ->
             when {
                 granted -> if(!cameraIO.hasPermissions(this)) requestCameraIOPermissions()
-                else -> snack("External Storage permission required")
+                else -> toast("External Storage permission required")
             }
         }
     }
@@ -182,12 +162,18 @@ class MainActivity : AppCompatActivity() {
         cameraIO.requestPermissions { granted ->
             when {
                 granted -> initialiseCamera(aspectRatio)
-                else -> snack("Camera permission required")
+                else -> toast("Camera permission required")
             }
         }
     }
 
-    private fun snack(message: String) = Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+    private fun toast(message: String?) = mainThread {
+        message?.let{
+            println(message)
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
+
+    }
 
     private fun toggleAspectRatio(){
         aspectRatio = when (aspectRatio) {
@@ -228,10 +214,7 @@ class MainActivity : AppCompatActivity() {
                 camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
                 autoFocus(null)
             } catch(exc: Exception) {
-                println("Stracka camera bind exception: $exc")
-                mainThread {
-                    snack("Stracka camera bind exception: $exc")
-                }
+                toast("Tirwedd camera bind exception: $exc")
             }
 
         }, ContextCompat.getMainExecutor(this))
