@@ -8,11 +8,6 @@
         app:useSimpleSummaryProvider="true" />
 
     <SwitchPreferenceCompat
-        app:key="show_original_thumbnail"
-        app:title="@string/show_original_thumbnail"
-        app:defaultValue="false"/>
-
-    <SwitchPreferenceCompat
         app:key="use_native_toolkit"
         app:title="@string/use_native_toolkit"
         app:summaryOn="@string/use_native_toolkit_summary"

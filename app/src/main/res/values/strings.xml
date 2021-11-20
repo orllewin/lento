@@ -4,7 +4,6 @@
     <string name="title_activity_settings">Settings</string>
 
     <string name="use_native_toolkit">Use native toolkit</string>
-    <string name="show_original_thumbnail">Show original photo thumbnail</string>
     <string name="use_letterbox">Apply 16:9 letterbox</string>
     <string name="letterbox_colour">Letterbox colour</string>
     <string name="use_letterbox_on_summary">Top and bottom bars will be applied to photo</string>
