@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.putImageProcessor(imageProcessor)
 
-        binding.overflow.setOnClickListener { OverflowMenu(this, binding.overflow).show() }
+        binding.overflowContainer.setOnClickListener { OverflowMenu(this, binding.overflow).show() }
 
         binding.zoomLayout.setOnClickListener {
             zoomRatio = when (zoomRatio) {
@@ -128,6 +128,12 @@ class MainActivity : AppCompatActivity() {
             autoFocus(motionEvent)
             true
         }
+
+        binding.borderLayout.setOnClickListener { toggleBorderSelect() }
+        setupBorderChips()
+
+        binding.filmLayout.setOnClickListener { toggleFilmSelect() }
+        setupFilmChips()
 
         binding.flashLayout.setOnClickListener { toggleFlashMode() }
         setupFlashChips()
@@ -217,6 +223,12 @@ class MainActivity : AppCompatActivity() {
                 toast("Tirwedd camera bind exception: $exc")
             }
 
+            delayed(1250){
+                binding.splashIcon.animate().alpha(0f).withEndAction {
+                    binding.splashIcon.hide()
+                }.duration = 500
+            }
+
         }, ContextCompat.getMainExecutor(this))
     }
 
@@ -228,7 +240,7 @@ class MainActivity : AppCompatActivity() {
                 controller.hide(WindowInsetsCompat.Type.systemBars())
                 controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
-        }, 500L)
+        }, 100L)
 
         val scaleFactor = PreferenceManager.getDefaultSharedPreferences(this).getString("horizontal_scale_factor", "1.33")!!.toFloat()
         binding.cameraxViewFinder.scaleX = scaleFactor
@@ -249,6 +261,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun toggleBorderSelect(){
+        if(binding.borderGroup.isVisible){
+            binding.borderGroup.animate().alpha(0f).withEndAction {
+                binding.borderGroup.hide()
+            }.duration = 250
+        }else{
+            binding.borderGroup.show()
+            binding.borderGroup.alpha = 0f
+            binding.borderGroup.animate().alpha(1f).duration = 250
+        }
+    }
+
+    private fun toggleFilmSelect(){
+        if(binding.filmGroup.isVisible){
+            binding.filmGroup.animate().alpha(0f).withEndAction {
+                binding.filmGroup.hide()
+            }.duration = 250
+        }else{
+            binding.filmGroup.show()
+            binding.filmGroup.alpha = 0f
+            binding.filmGroup.animate().alpha(1f).duration = 250
+        }
+    }
+
     private fun toggleFlashMode(){
         if(binding.flashGroup.isVisible){
             binding.flashGroup.animate().alpha(0f).withEndAction {
@@ -261,25 +297,54 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupBorderChips(){
+        binding.borderGroup.setOnCheckedChangeListener{ _, checkedId ->
+            when(checkedId){
+                R.id.border_none -> {
+                    binding.borderInner.setImageResource(R.drawable.vector_border_none)
+                    imageProcessor.borderMode = AnamorphicPhotoProcessor.Border.None
+                }
+                R.id.border_black -> {
+                    binding.borderInner.setImageResource(R.drawable.vector_border_black)
+                    imageProcessor.borderMode = AnamorphicPhotoProcessor.Border.Black
+                }
+                R.id.border_white -> {
+                    binding.borderInner.setImageResource(R.drawable.vector_border_white)
+                    imageProcessor.borderMode = AnamorphicPhotoProcessor.Border.White
+                }
+            }
+            toggleBorderSelect()
+        }
+    }
+
+    private fun setupFilmChips(){
+        binding.filmGroup.setOnCheckedChangeListener{ _, checkedId ->
+            when(checkedId){
+                R.id.film_none -> imageProcessor.filmResource = null
+                R.id.film_delta_400 -> imageProcessor.filmResource = R.raw.ilford_delta_400
+                R.id.film_fp_3000b -> imageProcessor.filmResource = R.raw.fuji_fp_3000b
+            }
+            toggleFilmSelect()
+        }
+    }
+
     private fun setupFlashChips(){
         binding.flashGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.chip_flash_on -> {
                     imageCapture?.flashMode = ImageCapture.FLASH_MODE_ON
                     binding.flashInner.setImageResource(R.drawable.vector_flash_on)
-                    toggleFlashMode()
                 }
                 R.id.chip_flash_off -> {
                     imageCapture?.flashMode = ImageCapture.FLASH_MODE_OFF
                     binding.flashInner.setImageResource(R.drawable.vector_flash_off)
-                    toggleFlashMode()
                 }
                 R.id.chip_flash_auto -> {
                     imageCapture?.flashMode = ImageCapture.FLASH_MODE_AUTO
                     binding.flashInner.setImageResource(R.drawable.vector_flash_auto)
-                    toggleFlashMode()
                 }
             }
+            toggleFlashMode()
         }
     }
 

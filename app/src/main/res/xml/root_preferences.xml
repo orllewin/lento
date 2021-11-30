@@ -14,22 +14,4 @@
         app:summaryOff="@string/use_android_method_summary"
         app:defaultValue="true"/>
 
-    <SwitchPreferenceCompat
-        app:key="use_letterbox"
-        app:title="@string/use_letterbox"
-        app:summaryOn="@string/use_letterbox_on_summary"
-        app:summaryOff="@string/use_letterbox_off_summary"
-        app:defaultValue="false"/>
-
-    <ListPreference
-        app:key="letterbox_colour"
-        app:dependency="use_letterbox"
-        app:title="@string/letterbox_colour"
-        app:entries="@array/letterbox_colour_entries"
-        app:entryValues="@array/letterbox_colour_values"
-        app:defaultValue="black"
-        app:summary="%s"
-        />
-
-
 </PreferenceScreen>

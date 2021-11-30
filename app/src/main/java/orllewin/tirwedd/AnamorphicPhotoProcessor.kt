@@ -16,10 +16,13 @@ import com.google.android.renderscript.Toolkit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import orllewin.haldclut.HaldClut
+import orllewin.tirwedd.hald.AndroidHaldCLUTImage
+import orllewin.tirwedd.hald.AndroidTargetHaldImage
 import java.io.File
 import java.time.OffsetDateTime
 
-class AnamorphicPhotoProcessor(context: Context, private val lifecycleScope: LifecycleCoroutineScope) {
+class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope: LifecycleCoroutineScope) {
 
     val exportedPreviewStateFlow = MutableStateFlow<Pair<Uri?, Bitmap?>?>(null)
     val errorStateFlow = MutableStateFlow<String?>(null)
@@ -30,8 +33,16 @@ class AnamorphicPhotoProcessor(context: Context, private val lifecycleScope: Lif
 
     val scaleFactor = 1.33f
     var useNativeToolkit = true
-    var useLetterbox = true
-    var letterBoxColour = Color.WHITE
+
+    var filmResource: Int? = null
+
+    sealed class Border{
+        object None: Border()
+        object Black: Border()
+        object White: Border()
+    }
+
+    var borderMode: Border = Border.None
 
 
     private var imageCapture: ImageCapture? = null
@@ -105,29 +116,31 @@ class AnamorphicPhotoProcessor(context: Context, private val lifecycleScope: Lif
         val uri = contentResolver.insert(collection, values)
 
         uri?.let {
-            when {
-                useLetterbox -> {
-                    val bitmapWidth = image.width
-                    val bitmapHeight = image.height
-                    val frameHeight = (bitmapWidth/16) * 9
-                    val letterBoxed = Bitmap.createBitmap(bitmapWidth, frameHeight, Bitmap.Config.ARGB_8888)
-                    val canvas = Canvas(letterBoxed)
-                    canvas.drawColor(letterBoxColour)
-                    canvas.drawBitmap(image, 0f, (frameHeight - bitmapHeight)/2f, Paint())
-                    this.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                        outputStream.use { os ->
-                            letterBoxed.compress(Bitmap.CompressFormat.JPEG, 100, os)
-                        }
-                    }
-                    letterBoxed.recycle()
-                }
-                else -> {
-                    this.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                        outputStream.use { os ->
-                            image.compress(Bitmap.CompressFormat.JPEG, 100, os)
-                        }
+            if(borderMode == Border.None){
+                this.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.use { os ->
+                        image.compress(Bitmap.CompressFormat.JPEG, 100, os)
                     }
                 }
+            }else{
+                val bitmapWidth = image.width
+                val bitmapHeight = image.height
+                val frameHeight = (bitmapWidth/16) * 9
+                val letterBoxed = Bitmap.createBitmap(bitmapWidth, frameHeight, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(letterBoxed)
+
+                val color = when (borderMode) {
+                    Border.White -> Color.WHITE
+                    else -> Color.BLACK
+                }
+                canvas.drawColor(color)
+                canvas.drawBitmap(image, 0f, (frameHeight - bitmapHeight)/2f, Paint())
+                this.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.use { os ->
+                        letterBoxed.compress(Bitmap.CompressFormat.JPEG, 100, os)
+                    }
+                }
+                letterBoxed.recycle()
             }
 
             values.clear()
@@ -142,49 +155,55 @@ class AnamorphicPhotoProcessor(context: Context, private val lifecycleScope: Lif
         }
     }
 
-
     /**
      * Desqueezes a photo from a File
      */
-    fun processBitmap(file: File, scale: Float, useNativeToolkit: Boolean, onDesqueezed: (desqueezed: Bitmap) -> Unit){
+    private fun processBitmap(file: File, scale: Float, nativeToolkit: Boolean, onDesqueezed: (desqueezed: Bitmap) -> Unit){
         lifecycleScope.launch(Dispatchers.IO) {
-            file.inputStream().use { inputStream ->
-                val squeezedBitmap = BitmapFactory.decodeStream(inputStream)
-                val targetWidth = (squeezedBitmap.width * scale).toInt()
-                val targetHeight = squeezedBitmap.height
-
-                if(useNativeToolkit){
-                    val desqueezedBitmap = Toolkit.resize(squeezedBitmap, targetWidth, targetHeight)
-                    squeezedBitmap.recycle()
-                    onDesqueezed(desqueezedBitmap)
-                }else{
-                    val desqueezedBitmap = Bitmap.createScaledBitmap(squeezedBitmap, targetWidth, targetHeight, true)
-                    squeezedBitmap.recycle()
-                    onDesqueezed(desqueezedBitmap)
+            when {
+                filmResource != null -> {
+                    applyFilter(context, file){ filteredFile ->
+                        desqueeze(filteredFile, scale, nativeToolkit, onDesqueezed)
+                    }
                 }
+                else -> desqueeze(file, scale, nativeToolkit, onDesqueezed)
             }
         }
     }
 
-    fun processBitmap(resolver: ContentResolver, uri: Uri, scale: Float, useNativeToolkit: Boolean, onDesqueezed: (desqueezed: Bitmap) -> Unit){
-        lifecycleScope.launch(Dispatchers.IO) {
-            resolver.openInputStream(uri).use { inputStream ->
-                val squeezedBitmap = BitmapFactory.decodeStream(inputStream)
-                val targetWidth = (squeezedBitmap.width * scale).toInt()
-                val targetHeight = squeezedBitmap.height
+    private fun desqueeze(file: File, scale: Float, nativeToolkit: Boolean, onDesqueezed: (desqueezed: Bitmap) -> Unit){
+        file.inputStream().use { inputStream ->
+            val squeezedBitmap = BitmapFactory.decodeStream(inputStream)
 
-                if(useNativeToolkit){
-                    val desqueezedBitmap = Toolkit.resize(squeezedBitmap, targetWidth, targetHeight)
-                    squeezedBitmap.recycle()
-                    onDesqueezed(desqueezedBitmap)
-                }else{
-                    val desqueezedBitmap = Bitmap.createScaledBitmap(squeezedBitmap, targetWidth, targetHeight, true)
-                    squeezedBitmap.recycle()
-                    onDesqueezed(desqueezedBitmap)
-                }
+            val targetWidth = (squeezedBitmap.width * scale).toInt()
+            val targetHeight = squeezedBitmap.height
 
+            if(nativeToolkit){
+                val desqueezedBitmap = Toolkit.resize(squeezedBitmap, targetWidth, targetHeight)
+                squeezedBitmap.recycle()
+                onDesqueezed(desqueezedBitmap)
+            }else{
+                val desqueezedBitmap = Bitmap.createScaledBitmap(squeezedBitmap, targetWidth, targetHeight, true)
+                squeezedBitmap.recycle()
+                onDesqueezed(desqueezedBitmap)
             }
         }
+    }
+
+    private fun applyFilter(context: Context, source: File, onSaved: (file: File) -> Unit){
+        val targetHaldImage = AndroidTargetHaldImage(source)
+
+        val haldClutImage = AndroidHaldCLUTImage(context, filmResource!!)
+
+        HaldClut(haldClutImage, targetHaldImage).process()
+
+        val outputFile = File.createTempFile("temp_filtered_hald", ".png", context.cacheDir)
+
+        outputFile.outputStream().use{ outputStream ->
+            targetHaldImage.bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        }
+
+        onSaved(outputFile)
     }
 
     private fun deviceName(): String = Build.MODEL.lowercase().replace(" ", "_")

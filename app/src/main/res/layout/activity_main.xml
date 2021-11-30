@@ -90,25 +90,155 @@
 
         </RelativeLayout>
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/overflow"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/menu"
-            android:src="@drawable/vector_overflow"
-            android:tint="@color/white"
-            tools:ignore="TouchTargetSizeCheck" />
+        <RelativeLayout
+            android:id="@+id/overflow_container"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_alignParentEnd="true">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/overflow"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerInParent="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/menu"
+                android:src="@drawable/vector_overflow"
+                android:tint="@color/white" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/border_container"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_container_height"
+            android:layout_above="@+id/film_container"
+            android:layout_marginStart="@dimen/control_left_padding"
+            android:layout_marginBottom="4dp">
+
+            <RelativeLayout
+                android:id="@+id/border_layout"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:backgroundTint="@color/white"
+                android:clickable="true"
+                android:focusable="true">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/border_inner"
+                    android:layout_width="24dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/vector_border_none" />
+
+            </RelativeLayout>
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/border_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/border_layout"
+                android:visibility="gone"
+                app:checkedChip="@+id/chip_flash_off"
+                app:selectionRequired="true"
+                app:singleLine="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/border_none"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:text="None" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/border_white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:text="White" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/border_black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:text="Black" />
+            </com.google.android.material.chip.ChipGroup>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/film_container"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_container_height"
+            android:layout_above="@+id/flash_container"
+            android:layout_marginStart="@dimen/control_left_padding"
+            android:layout_marginBottom="4dp">
+
+            <RelativeLayout
+                android:id="@+id/film_layout"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:backgroundTint="@color/white"
+                android:clickable="true"
+                android:focusable="true">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/film_inner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingEnd="12dp"
+                    android:src="@drawable/ic_vector_film_icon"
+                    android:tint="@color/white" />
+
+            </RelativeLayout>
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/film_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/film_layout"
+                android:visibility="gone"
+                app:checkedChip="@+id/chip_flash_off"
+                app:selectionRequired="true"
+                app:singleLine="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/film_none"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:text="None" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/film_delta_400"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:text="Delta 400" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/film_fp_3000b"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:text="FP 3000b" />
+            </com.google.android.material.chip.ChipGroup>
+
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/flash_container"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/button_container_height"
             android:layout_above="@+id/zoom_container"
             android:layout_marginStart="@dimen/control_left_padding"
             android:layout_marginBottom="4dp">
@@ -128,7 +258,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/vector_flash_on"
+                    android:src="@drawable/vector_flash_off"
                     android:tint="@color/white" />
 
             </RelativeLayout>
@@ -243,5 +373,14 @@
                 android:text="16:9"
                 android:textColor="@color/white" />
         </RelativeLayout>
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/splash_icon"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/vector_tirwedd" />
     </RelativeLayout>
 </layout>

@@ -2,13 +2,17 @@ package orllewin.extensions
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.Rect
 import android.net.Uri
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
+import android.util.TypedValue
+import android.view.TouchDelegate
 import androidx.preference.PreferenceManager
 import android.view.View
 import android.view.Window
@@ -107,6 +111,14 @@ fun Uri.isImage(): Boolean{
             lowercase.endsWith(".jpeg") ||
             lowercase.endsWith(".gif")
 }
+
+/**
+ * Int
+ */
+val Number.toPixels get() = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    this.toFloat(),
+    Resources.getSystem().displayMetrics)
 
 /**
  * String
