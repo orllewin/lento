@@ -47,6 +47,7 @@ dependencies {
 
     implementation project(path: ':modules:extensions')
     implementation project(path: ':modules:file_io')
+    implementation project(path: ':modules:haldclut')
     implementation project(path: ':modules:renderscript_toolkit')
 
     implementation "androidx.camera:camera-core:1.1.0-alpha11"
@@ -54,5 +55,4 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:1.1.0-alpha11"
     implementation 'androidx.camera:camera-extensions:1.0.0-alpha31'
     implementation 'androidx.camera:camera-view:1.0.0-alpha31'
-    implementation project(path: ':modules:haldclut')
 }

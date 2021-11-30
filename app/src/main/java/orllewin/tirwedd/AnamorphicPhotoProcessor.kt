@@ -16,6 +16,7 @@ import com.google.android.renderscript.Toolkit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import orllewin.haldclut.FFMpegHaldCLUT
 import orllewin.haldclut.HaldClut
 import orllewin.tirwedd.hald.AndroidHaldCLUTImage
 import orllewin.tirwedd.hald.AndroidTargetHaldImage
@@ -73,16 +74,43 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
             })
     }
 
+    val useFFMpeg = true
+
     private fun processCacheFile(file: File){
-        processBitmap(file, scaleFactor, useNativeToolkit) { desqueezedBitmap ->
-            exportImage(desqueezedBitmap){ uri, error ->
-                when {
-                    error != null -> errorStateFlow.value = "Tirwedd save capture error: $error"
-                    else -> {
-                        println("Tirwedd save capture uri: $uri")
-                        //todo - create smaller image with correct ratio...
-                        val previewBitmap = Bitmap.createScaledBitmap(desqueezedBitmap, 200, 100, true)
-                        exportedPreviewStateFlow.value = Pair(uri, previewBitmap)
+        if(useFFMpeg && filmResource != null){
+            val ffmpeg = FFMpegHaldCLUT(context)
+            ffmpeg.process(filmResource!!, file){ filteredFile, error ->
+                if(error != null){
+                    //todo - handle
+                    println("error: $error")
+                }else{
+                    processBitmap(filteredFile!!, scaleFactor, useNativeToolkit) { desqueezedBitmap ->
+                        exportImage(desqueezedBitmap){ uri, error ->
+                            when {
+                                error != null -> errorStateFlow.value = "Tirwedd save capture error: $error"
+                                else -> {
+                                    println("Tirwedd save capture uri: $uri")
+                                    //todo - create smaller image with correct ratio...
+                                    val previewBitmap = Bitmap.createScaledBitmap(desqueezedBitmap, 200, 100, true)
+                                    exportedPreviewStateFlow.value = Pair(uri, previewBitmap)
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }else{
+            processBitmap(file, scaleFactor, useNativeToolkit) { desqueezedBitmap ->
+                exportImage(desqueezedBitmap){ uri, error ->
+                    when {
+                        error != null -> errorStateFlow.value = "Tirwedd save capture error: $error"
+                        else -> {
+                            println("Tirwedd save capture uri: $uri")
+                            //todo - create smaller image with correct ratio...
+                            val previewBitmap = Bitmap.createScaledBitmap(desqueezedBitmap, 200, 100, true)
+                            exportedPreviewStateFlow.value = Pair(uri, previewBitmap)
+                        }
                     }
                 }
             }
@@ -103,13 +131,12 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Oppen")
+            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Tirwedd")
             values.put(MediaStore.Images.Media.IS_PENDING, true)
         }
 
         val collection = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> MediaStore.Images.Media.getContentUri(
-                MediaStore.VOLUME_EXTERNAL)
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
             else -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         }
 
@@ -161,7 +188,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
     private fun processBitmap(file: File, scale: Float, nativeToolkit: Boolean, onDesqueezed: (desqueezed: Bitmap) -> Unit){
         lifecycleScope.launch(Dispatchers.IO) {
             when {
-                filmResource != null -> {
+                !useFFMpeg && filmResource != null -> {
                     applyFilter(context, file){ filteredFile ->
                         desqueeze(filteredFile, scale, nativeToolkit, onDesqueezed)
                     }
