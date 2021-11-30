@@ -44,7 +44,6 @@ class FFMpegHaldCLUT(val context: Context) {
                 onProcessed(tempFilteredFile, null)
             }else{
                 //Error
-                throw Exception("FFMpeg: Failed to procdess using FFMpeg: $stackTrace")
                 onProcessed(null, stackTrace)
             }
         }, { log ->
