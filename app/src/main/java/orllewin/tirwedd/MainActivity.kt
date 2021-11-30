@@ -15,13 +15,11 @@ import androidx.camera.core.AspectRatio.RATIO_16_9
 import androidx.camera.core.AspectRatio.RATIO_4_3
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.isVisible
+import androidx.core.view.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.PreferenceManager
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -318,12 +316,42 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupFilmChips(){
-        binding.filmGroup.setOnCheckedChangeListener{ _, checkedId ->
-            when(checkedId){
-                R.id.film_none -> imageProcessor.filmResource = null
-                R.id.film_delta_400 -> imageProcessor.filmResource = R.raw.ilford_delta_400
-                R.id.film_fp_3000b -> imageProcessor.filmResource = R.raw.fuji_fp_3000b
+
+        binding.filmGroup.removeAllViews()
+
+        val fileLabels = resources.getStringArray(R.array.film_labels)
+        val fileResources = resources.getStringArray(R.array.film_raw_resources)
+
+        fileLabels.forEachIndexed { index, label ->
+            val chip = Chip(this)
+            chip.text = label
+
+            val rawId = fileResources[index]
+            chip.tag = rawId
+            chip.isCheckable = true
+            chip.id = ViewCompat.generateViewId()
+            binding.filmGroup.addView(chip)
+        }
+
+
+        binding.filmGroup.setOnCheckedChangeListener{ _, id ->
+
+
+            val checkChip = binding.filmGroup.findViewById<Chip>(id)
+            val tag = checkChip.tag.toString()
+            when (tag) {
+                "none" -> imageProcessor.filmResource = null
+                else -> {
+                    val resId = resources.getIdentifier(tag, "raw", packageName)
+                    imageProcessor.filmResource = resId
+                }
             }
+
+//            when(checkedId){
+//                R.id.film_none -> imageProcessor.filmResource = null
+//                R.id.film_delta_400 -> imageProcessor.filmResource = R.drawable.ilford_delta_400
+//                R.id.film_fp_3000b -> imageProcessor.filmResource = R.drawable.fuji_fp_3000b
+//            }
             toggleFilmSelect()
         }
     }

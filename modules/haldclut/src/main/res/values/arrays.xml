@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="film_labels">
+        <item>None</item>
+        <item>AGFA APX 25</item>
+        <item>Ilford Delta 400</item>
+        <item>Ilford Pan F Plus 50</item>
+        <item>Fuji FP 3000b</item>
+    </string-array>
+
+    <string-array name="film_raw_resources">
+        <item>none</item>
+        <item>agfa_apx_25</item>
+        <item>ilford_delta_400</item>
+        <item>ilford_pan_f_plus_50</item>
+        <item>fuji_fp_3000b</item>
+    </string-array>
+</resources>
