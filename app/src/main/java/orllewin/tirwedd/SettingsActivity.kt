@@ -3,9 +3,11 @@ package orllewin.tirwedd
 import android.os.Bundle
 import android.text.InputType
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceFragmentCompat
+import java.lang.NumberFormatException
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -36,7 +38,20 @@ class SettingsActivity : AppCompatActivity() {
 
             val scaleAmountPreference = preferenceManager.findPreference<EditTextPreference>("horizontal_scale_factor")
             scaleAmountPreference?.setOnBindEditTextListener { editText ->
-                editText.inputType = InputType.TYPE_CLASS_NUMBER
+                //NOOP
+            }
+
+            scaleAmountPreference?.setOnPreferenceChangeListener { preference, newValue ->
+                var isValid = true
+
+                try {
+                    val scaleFactor: Float = "$newValue".toFloat()
+                } catch (e: NumberFormatException) {
+                    isValid = false
+                    Toast.makeText(this@SettingsFragment.requireContext(), "$newValue is not a valid float value", Toast.LENGTH_SHORT).show()
+                }
+
+                isValid
             }
         }
     }

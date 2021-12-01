@@ -25,6 +25,7 @@ import java.time.OffsetDateTime
 
 class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope: LifecycleCoroutineScope) {
 
+
     val exportedPreviewStateFlow = MutableStateFlow<Pair<Uri?, Bitmap?>?>(null)
     val errorStateFlow = MutableStateFlow<String?>(null)
 
@@ -34,7 +35,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
 
     val scaleFactor = 1.33f
     var useNativeToolkit = true
-
+    var doDesqueeze: Boolean = true
     var filmResource: Int? = null
 
     sealed class Border{
@@ -202,17 +203,23 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         file.inputStream().use { inputStream ->
             val squeezedBitmap = BitmapFactory.decodeStream(inputStream)
 
-            val targetWidth = (squeezedBitmap.width * scale).toInt()
-            val targetHeight = squeezedBitmap.height
+            if(doDesqueeze) {
 
-            if(nativeToolkit){
-                val desqueezedBitmap = Toolkit.resize(squeezedBitmap, targetWidth, targetHeight)
-                squeezedBitmap.recycle()
-                onDesqueezed(desqueezedBitmap)
+                val targetWidth = (squeezedBitmap.width * scale).toInt()
+                val targetHeight = squeezedBitmap.height
+
+                if (nativeToolkit) {
+                    val desqueezedBitmap = Toolkit.resize(squeezedBitmap, targetWidth, targetHeight)
+                    squeezedBitmap.recycle()
+                    onDesqueezed(desqueezedBitmap)
+                } else {
+                    val desqueezedBitmap =
+                        Bitmap.createScaledBitmap(squeezedBitmap, targetWidth, targetHeight, true)
+                    squeezedBitmap.recycle()
+                    onDesqueezed(desqueezedBitmap)
+                }
             }else{
-                val desqueezedBitmap = Bitmap.createScaledBitmap(squeezedBitmap, targetWidth, targetHeight, true)
-                squeezedBitmap.recycle()
-                onDesqueezed(desqueezedBitmap)
+                onDesqueezed(squeezedBitmap)
             }
         }
     }

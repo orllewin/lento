@@ -115,11 +115,7 @@ fun Uri.isImage(): Boolean{
 /**
  * Int
  */
-val Number.toPixels get() = TypedValue.applyDimension(
-    TypedValue.COMPLEX_UNIT_DIP,
-    this.toFloat(),
-    Resources.getSystem().displayMetrics)
-
+fun Int.toPixels(): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), Resources.getSystem().displayMetrics).toInt()
 /**
  * String
  */

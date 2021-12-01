@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/modules/file_io" />
             <option value="$PROJECT_DIR$/modules/haldclut" />
             <option value="$PROJECT_DIR$/modules/renderscript_toolkit" />
+            <option value="$PROJECT_DIR$/modules/skiss" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -45,9 +45,12 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
 
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
+
     implementation project(path: ':modules:extensions')
     implementation project(path: ':modules:file_io')
     implementation project(path: ':modules:haldclut')
+    implementation project(path: ':modules:skiss')
     implementation project(path: ':modules:renderscript_toolkit')
 
     implementation "androidx.camera:camera-core:1.1.0-alpha11"

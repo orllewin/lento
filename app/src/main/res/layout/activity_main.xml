@@ -64,6 +64,20 @@
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/mode_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="60dp"
+            android:text="Anamorphic"
+            android:checked="true"
+            app:thumbTint="@color/white"
+            app:trackTint="@color/white"
+            android:textColor="#ffffff"
+            android:paddingTop="20dp"
+            android:layout_toLeftOf="@id/overflow_container"/>
+
 
         <RelativeLayout
             android:id="@+id/camera_buttons"
@@ -85,8 +99,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:src="@drawable/camera_inner"
-                android:onClick="@{() -> viewmodel.capturePhoto()}"/>
+                android:onClick="@{() -> viewmodel.capturePhoto()}"
+                android:src="@drawable/camera_inner" />
 
         </RelativeLayout>
 
@@ -199,19 +213,19 @@
 
             </RelativeLayout>
 
+
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/film_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/film_layout"
+                app:lineSpacing="20dp"
                 android:visibility="gone"
-                app:checkedChip="@+id/chip_flash_off"
+                app:chipSpacingVertical="4dp"
+                app:chipSpacing="0dp"
                 app:selectionRequired="true"
-                app:singleLine="true"
-                app:singleSelection="true">
+                app:singleLine="false"
+                app:singleSelection="true" />
 
-            </com.google.android.material.chip.ChipGroup>
 
         </RelativeLayout>
 
@@ -362,5 +376,13 @@
             android:adjustViewBounds="true"
             android:layout_centerInParent="true"
             android:src="@drawable/vector_tirwedd" />
+
+        <orllewin.skiss.SkissView
+            android:id="@+id/level_skiss"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"/>
+
+
     </RelativeLayout>
 </layout>

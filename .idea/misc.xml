@@ -13,6 +13,7 @@
         <entry key="app/src/main/res/drawable/vector_border_white.xml" value="0.16510416666666666" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_settings.xml" value="0.14895833333333333" />
+        <entry key="app/src/main/res/layout/dialog_film_selection.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/dialog_first_run.xml" value="0.14895833333333333" />
         <entry key="app/src/main/res/xml/root_preferences.xml" value="0.14895833333333333" />
       </map>

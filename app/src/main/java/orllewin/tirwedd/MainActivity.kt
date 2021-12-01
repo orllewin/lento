@@ -2,6 +2,10 @@ package orllewin.tirwedd
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -29,6 +33,10 @@ import orllewin.file_io.OppenFileIO
 import orllewin.tirwedd.databinding.ActivityMainBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import android.R.string.no
+
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,6 +56,9 @@ class MainActivity : AppCompatActivity() {
 
     private var camera: Camera? = null
     private var zoomRatio = 1f
+
+    //Level/Sensor
+    var sensorManager: SensorManager? = null
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,6 +115,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.overflowContainer.setOnClickListener { OverflowMenu(this, binding.overflow).show() }
 
+        setupCameraMode()
+
         binding.zoomLayout.setOnClickListener {
             zoomRatio = when (zoomRatio) {
                 1f -> {
@@ -130,8 +143,11 @@ class MainActivity : AppCompatActivity() {
         binding.borderLayout.setOnClickListener { toggleBorderSelect() }
         setupBorderChips()
 
-        binding.filmLayout.setOnClickListener { toggleFilmSelect() }
-        setupFilmChips()
+        binding.filmLayout.setOnClickListener {
+            FilmSelectionDialog(this){ resId ->
+                imageProcessor.filmResource = resId
+            }.show()
+        }
 
         binding.flashLayout.setOnClickListener { toggleFlashMode() }
         setupFlashChips()
@@ -226,7 +242,6 @@ class MainActivity : AppCompatActivity() {
                     binding.splashIcon.hide()
                 }.duration = 500
             }
-
         }, ContextCompat.getMainExecutor(this))
     }
 
@@ -247,6 +262,8 @@ class MainActivity : AppCompatActivity() {
             putBooleanPref("is_first_run", false)
             FirstRunDialog(this).show()
         }
+
+        startLevel()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -256,6 +273,29 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             else -> super.onKeyDown(keyCode, event)
+        }
+    }
+
+    private fun setupCameraMode(){
+        if(getBooleanPref("mode_anamorphic", true)){
+            binding.modeSwitch.text = "Anamorphic"
+            binding.modeSwitch.isChecked = true
+        }else{
+            binding.modeSwitch.text = "Standard"
+            binding.modeSwitch.isChecked = false
+        }
+        binding.modeSwitch.setOnCheckedChangeListener { _, checked ->
+            if(checked){
+                binding.modeSwitch.text = "Anamorphic"
+                binding.cameraxViewFinder.scaleX = getStringPref("horizontal_scale_factor", "1.33")!!.toFloat()
+                imageProcessor.doDesqueeze = true
+                putBooleanPref("mode_anamorphic", true)
+            }else{
+                binding.modeSwitch.text = "Standard"
+                binding.cameraxViewFinder.scaleX = 1.0f
+                imageProcessor.doDesqueeze = false
+                putBooleanPref("mode_anamorphic", false)
+            }
         }
     }
 
@@ -395,5 +435,61 @@ class MainActivity : AppCompatActivity() {
         } catch (e: CameraInfoUnavailableException) {
             println("Stracka cannot access camera: $e")
         }
+    }
+
+    var gravityValues: FloatArray? = null
+    var magneticValues: FloatArray? = null
+
+    var levelListener: SensorEventListener? = null
+
+    private fun startLevel(){
+
+        val skiss = LevelSkiss(
+            binding.levelSkiss
+        )
+
+        skiss.start()
+
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+
+        val accelerometer: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        val magnetometer: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+
+        levelListener = object: SensorEventListener{
+            override fun onSensorChanged(event: SensorEvent?) {
+
+                if(event == null) return
+
+                if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) gravityValues = event.values
+                if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD) magneticValues = event.values
+                if (gravityValues != null &&  magneticValues != null) {
+                    val R = FloatArray(9)
+                    val I = FloatArray(9)
+                    if(SensorManager.getRotationMatrix(R, I, gravityValues, magneticValues)){
+                        val orientation = FloatArray(3)
+                        SensorManager.getOrientation(R, orientation)
+                        //val azimuth = orientation[0]
+                        val pitch = orientation[1]
+                        //val roll = orientation[2]
+                        val pitchDegrees = Math.toDegrees(pitch.toDouble())
+                        println("Pitch: $pitchDegrees")
+                        skiss.setDegrees(pitchDegrees)
+                    }
+                }
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, p1: Int) = Unit
+
+        }
+
+        sensorManager?.registerListener(levelListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        sensorManager?.registerListener(levelListener, magnetometer, SensorManager.SENSOR_DELAY_UI);
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        sensorManager?.unregisterListener(levelListener)
     }
 }
