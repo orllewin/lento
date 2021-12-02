@@ -16,7 +16,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import orllewin.extensions.toPixels
 import orllewin.tirwedd.databinding.DialogFilmSelectionBinding
 
-class FilmSelectionDialog(val context: Context, val onFilmSelect: (resId: Int?) -> Unit): View.OnClickListener {
+class FilmSelectionDialog(val context: Context, val onFilmSelect: (resId: Int?, label: String?) -> Unit): View.OnClickListener {
 
     private var dialog: AlertDialog? = null
 
@@ -26,32 +26,84 @@ class FilmSelectionDialog(val context: Context, val onFilmSelect: (resId: Int?) 
         val view: View = LayoutInflater.from(context).inflate(R.layout.dialog_film_selection, null, false)
         val binding = DialogFilmSelectionBinding.bind(view)
 
-        val fileLabels = context.resources.getStringArray(R.array.film_labels)
-        val fileResources = context.resources.getStringArray(R.array.film_raw_resources)
+        //Colour
+        val fileLabelsColour = context.resources.getStringArray(R.array.film_labels_colour)
+        val fileResourcesColour = context.resources.getStringArray(R.array.film_raw_resources_colour)
 
-        fileLabels.forEachIndexed { index, label ->
+        fileLabelsColour.forEachIndexed { index, label ->
             val chip = Chip(context)
 
             chip.text = label
 
-            val rawId = fileResources[index]
+            val rawId = fileResourcesColour[index]
             chip.tag = rawId
             chip.isCheckable = true
             chip.id = ViewCompat.generateViewId()
             chip.setOnClickListener(this)
-            binding.flexBox.addView(chip)
+            binding.flexBoxColour.addView(chip)
         }
 
-        binding.flexBox.children.iterator().forEach { view ->
+        binding.flexBoxColour.children.iterator().forEach { view ->
             val lp = view.layoutParams as FlexboxLayout.LayoutParams
-            lp.setMargins(0, 0, 16.toPixels(), 0)
+            lp.setMargins(0, 0, 8.toPixels(), 0)
             view.layoutParams = lp
         }
+
+        //End of colour
+
+        //Monochrome
+        val fileLabelsBW = context.resources.getStringArray(R.array.film_labels_bw)
+        val fileResourcesBW = context.resources.getStringArray(R.array.film_raw_resources_bw)
+
+        fileLabelsBW.forEachIndexed { index, label ->
+            val chip = Chip(context)
+
+            chip.text = label
+
+            val rawId = fileResourcesBW[index]
+            chip.tag = rawId
+            chip.isCheckable = true
+            chip.id = ViewCompat.generateViewId()
+            chip.setOnClickListener(this)
+            binding.flexBoxBw.addView(chip)
+        }
+
+        binding.flexBoxBw.children.iterator().forEach { view ->
+            val lp = view.layoutParams as FlexboxLayout.LayoutParams
+            lp.setMargins(0, 0, 8.toPixels(), 0)
+            view.layoutParams = lp
+        }
+
+        //End of monochrome
+
+        //Start of misc
+        val fileLabelsMisc = context.resources.getStringArray(R.array.film_labels_misc)
+        val fileResourcesMisc = context.resources.getStringArray(R.array.film_raw_resources_misc)
+
+        fileLabelsMisc.forEachIndexed { index, label ->
+            val chip = Chip(context)
+
+            chip.text = label
+
+            val rawId = fileResourcesMisc[index]
+            chip.tag = rawId
+            chip.isCheckable = true
+            chip.id = ViewCompat.generateViewId()
+            chip.setOnClickListener(this)
+            binding.flexBoxMisc.addView(chip)
+        }
+
+        binding.flexBoxMisc.children.iterator().forEach { view ->
+            val lp = view.layoutParams as FlexboxLayout.LayoutParams
+            lp.setMargins(0, 0, 8.toPixels(), 0)
+            view.layoutParams = lp
+        }
+
+        //End of misc
 
         builder.setView(view)
         dialog = builder.create()
 
-        //dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#22ff00cc")))
     }
 
     fun show(){
@@ -60,10 +112,10 @@ class FilmSelectionDialog(val context: Context, val onFilmSelect: (resId: Int?) 
 
     override fun onClick(view: View?) {
         when (val tag = view?.tag.toString()) {
-            "none" -> onFilmSelect(null)
+            "none" -> onFilmSelect(null, null)
             else -> {
                 val resId = context.resources.getIdentifier(tag, "raw", context.packageName)
-                onFilmSelect(resId)
+                onFilmSelect(resId, (view as Chip).text.toString())
             }
         }
 

@@ -1,6 +1,5 @@
 package orllewin.tirwedd
 
-import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.*
@@ -24,7 +23,6 @@ import java.io.File
 import java.time.OffsetDateTime
 
 class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope: LifecycleCoroutineScope) {
-
 
     val exportedPreviewStateFlow = MutableStateFlow<Pair<Uri?, Bitmap?>?>(null)
     val errorStateFlow = MutableStateFlow<String?>(null)
@@ -75,10 +73,8 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
             })
     }
 
-    val useFFMpeg = true
-
     private fun processCacheFile(file: File){
-        if(useFFMpeg && filmResource != null){
+        if(filmResource != null){
             val ffmpeg = FFMpegHaldCLUT(context)
             ffmpeg.process(filmResource!!, file){ filteredFile, error ->
                 if(error != null){
@@ -99,7 +95,6 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
                         }
                     }
                 }
-
             }
         }else{
             processBitmap(file, scaleFactor, useNativeToolkit) { desqueezedBitmap ->
@@ -189,7 +184,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
     private fun processBitmap(file: File, scale: Float, nativeToolkit: Boolean, onDesqueezed: (desqueezed: Bitmap) -> Unit){
         lifecycleScope.launch(Dispatchers.IO) {
             when {
-                !useFFMpeg && filmResource != null -> {
+                filmResource != null -> {
                     applyFilter(context, file){ filteredFile ->
                         desqueeze(filteredFile, scale, nativeToolkit, onDesqueezed)
                     }

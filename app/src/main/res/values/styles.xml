@@ -3,11 +3,18 @@
     <style name="modern_material_dialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="colorPrimary">@color/lens_red</item>
         <item name="colorPrimaryDark">@color/lens_red</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialogText</item>
         <item name="textAllCaps">false</item>
         <item name="android:background">#000000</item>
+        <item name="android:textColor">#ffffff</item>
         <item name="shapeAppearanceOverlay">@style/round_corners</item>
 
     </style>
+
+    <style name="MaterialAlertDialogText" parent="@style/MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textColor">#ffffff</item>
+    </style>
+
 
     <style name="round_corners">
         <item name="cornerFamily">rounded</item>

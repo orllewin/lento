@@ -35,9 +35,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import android.R.string.no
 
-
-
-
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
@@ -77,6 +74,11 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
 
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch{
+                    viewModel.hudMessageFlow.collect { hudMessage ->
+                        binding.hudMessage.text = hudMessage
+                    }
+                }
                 launch {
                     viewModel.takePhotoStateFlow.asStateFlow().collect { captureTrigger ->
                         if (captureTrigger) {
@@ -113,7 +115,26 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.putImageProcessor(imageProcessor)
 
-        binding.overflowContainer.setOnClickListener { OverflowMenu(this, binding.overflow).show() }
+        binding.overflowContainer.setOnClickListener { OverflowMenu(this, binding.overflow, viewModel.isTimerActive, {
+            //onTogglelevel
+            when {
+                binding.levelSkiss.isVisible -> {
+                    binding.levelSkiss.hide()
+                    stopLevel()
+                }
+                else -> {
+                    binding.levelSkiss.show()
+                    startLevel()
+                }
+            }
+        }, {
+            //onToggleTimer
+            viewModel.timerActive(!viewModel.isTimerActive)
+            when {
+                viewModel.isTimerActive -> binding.timerIcon.show()
+                else -> binding.timerIcon.hide()
+            }
+        }).show() }
 
         setupCameraMode()
 
@@ -144,8 +165,9 @@ class MainActivity : AppCompatActivity() {
         setupBorderChips()
 
         binding.filmLayout.setOnClickListener {
-            FilmSelectionDialog(this){ resId ->
+            FilmSelectionDialog(this){ resId, label ->
                 imageProcessor.filmResource = resId
+                binding.selectedFilmLabel.text = label
             }.show()
         }
 
@@ -263,7 +285,7 @@ class MainActivity : AppCompatActivity() {
             FirstRunDialog(this).show()
         }
 
-        startLevel()
+        if(binding.levelSkiss.isVisible) startLevel()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -280,9 +302,13 @@ class MainActivity : AppCompatActivity() {
         if(getBooleanPref("mode_anamorphic", true)){
             binding.modeSwitch.text = "Anamorphic"
             binding.modeSwitch.isChecked = true
+            binding.cameraxViewFinder.scaleX = getStringPref("horizontal_scale_factor", "1.33")!!.toFloat()
+            imageProcessor.doDesqueeze = true
         }else{
             binding.modeSwitch.text = "Standard"
             binding.modeSwitch.isChecked = false
+            binding.cameraxViewFinder.scaleX = 1.0f
+            imageProcessor.doDesqueeze = false
         }
         binding.modeSwitch.setOnCheckedChangeListener { _, checked ->
             if(checked){
@@ -308,18 +334,6 @@ class MainActivity : AppCompatActivity() {
             binding.borderGroup.show()
             binding.borderGroup.alpha = 0f
             binding.borderGroup.animate().alpha(1f).duration = 250
-        }
-    }
-
-    private fun toggleFilmSelect(){
-        if(binding.filmGroup.isVisible){
-            binding.filmGroup.animate().alpha(0f).withEndAction {
-                binding.filmGroup.hide()
-            }.duration = 250
-        }else{
-            binding.filmGroup.show()
-            binding.filmGroup.alpha = 0f
-            binding.filmGroup.animate().alpha(1f).duration = 250
         }
     }
 
@@ -352,47 +366,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             toggleBorderSelect()
-        }
-    }
-
-    private fun setupFilmChips(){
-
-        binding.filmGroup.removeAllViews()
-
-        val fileLabels = resources.getStringArray(R.array.film_labels)
-        val fileResources = resources.getStringArray(R.array.film_raw_resources)
-
-        fileLabels.forEachIndexed { index, label ->
-            val chip = Chip(this)
-            chip.text = label
-
-            val rawId = fileResources[index]
-            chip.tag = rawId
-            chip.isCheckable = true
-            chip.id = ViewCompat.generateViewId()
-            binding.filmGroup.addView(chip)
-        }
-
-
-        binding.filmGroup.setOnCheckedChangeListener{ _, id ->
-
-
-            val checkChip = binding.filmGroup.findViewById<Chip>(id)
-            val tag = checkChip.tag.toString()
-            when (tag) {
-                "none" -> imageProcessor.filmResource = null
-                else -> {
-                    val resId = resources.getIdentifier(tag, "raw", packageName)
-                    imageProcessor.filmResource = resId
-                }
-            }
-
-//            when(checkedId){
-//                R.id.film_none -> imageProcessor.filmResource = null
-//                R.id.film_delta_400 -> imageProcessor.filmResource = R.drawable.ilford_delta_400
-//                R.id.film_fp_3000b -> imageProcessor.filmResource = R.drawable.fuji_fp_3000b
-//            }
-            toggleFilmSelect()
         }
     }
 
@@ -472,7 +445,6 @@ class MainActivity : AppCompatActivity() {
                         val pitch = orientation[1]
                         //val roll = orientation[2]
                         val pitchDegrees = Math.toDegrees(pitch.toDouble())
-                        println("Pitch: $pitchDegrees")
                         skiss.setDegrees(pitchDegrees)
                     }
                 }
@@ -487,9 +459,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    fun stopLevel(){
+        sensorManager?.unregisterListener(levelListener)
+    }
+
     override fun onPause() {
         super.onPause()
 
-        sensorManager?.unregisterListener(levelListener)
+        if(binding.levelSkiss.isVisible) stopLevel()
     }
 }

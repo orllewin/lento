@@ -47,7 +47,7 @@ class FFMpegHaldCLUT(val context: Context) {
                 onProcessed(null, stackTrace)
             }
         }, { log ->
-            println("FFMpeg log: $log")
+            println("FFMpeg half clut log: $log")
         }){ stats ->
             //NOOP
         }

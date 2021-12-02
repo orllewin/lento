@@ -7,7 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 
-class OverflowMenu(private val context: Context, view: View) {
+class OverflowMenu(private val context: Context, view: View, timerActive: Boolean, onToggleLevel: () -> Unit, onTimerToggle: () -> Unit) {
 
     private val popup = PopupMenu(context, view)
 
@@ -16,6 +16,24 @@ class OverflowMenu(private val context: Context, view: View) {
         cameraItem.setOnMenuItemClickListener {
             val intent = Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA)
             context.startActivity(intent)
+            true
+        }
+
+
+        val timerItem = if(timerActive){
+            popup.menu.add("Turn timer off")
+        }else{
+            popup.menu.add("Turn timer on")
+        }
+
+        timerItem.setOnMenuItemClickListener {
+            onTimerToggle()
+            true
+        }
+
+        val levelItem = popup.menu.add("Toggle level")
+        levelItem.setOnMenuItemClickListener {
+            onToggleLevel()
             true
         }
 
