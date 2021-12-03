@@ -35,6 +35,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
     var useNativeToolkit = true
     var doDesqueeze: Boolean = true
     var filmResource: Int? = null
+    var filmLabel: String? = null
 
     sealed class Border{
         object None: Border()
@@ -51,6 +52,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         this.imageCapture = imageCapture
     }
 
+    //1. Take the photo
     fun capturePhoto(){
 
         if(imageCapture == null){
@@ -61,42 +63,44 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         val cacheFile = File.createTempFile("tirwedd_temp_capture", ".jpg", cacheDir)
 
         val outputOptions = ImageCapture.OutputFileOptions.Builder(cacheFile).build()
-        imageCapture!!.takePicture(
+        imageCapture?.takePicture(
             outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     errorStateFlow.value = "Tirwedd cameraX capture exception: ${exc.message}"
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    processCacheFile(cacheFile)
+                    processCapture(cacheFile)
                 }
             })
     }
 
-    private fun processCacheFile(file: File){
-        if(filmResource != null){
-            val ffmpeg = FFMpegHaldCLUT(context)
-            ffmpeg.process(filmResource!!, file){ filteredFile, error ->
-                if(error != null){
-                    //todo - handle
-                    println("error: $error")
-                }else{
-                    processBitmap(filteredFile!!, scaleFactor, useNativeToolkit) { desqueezedBitmap ->
-                        exportImage(desqueezedBitmap){ uri, error ->
-                            when {
-                                error != null -> errorStateFlow.value = "Tirwedd save capture error: $error"
-                                else -> {
-                                    println("Tirwedd save capture uri: $uri")
-                                    //todo - create smaller image with correct ratio...
-                                    val previewBitmap = Bitmap.createScaledBitmap(desqueezedBitmap, 200, 100, true)
-                                    exportedPreviewStateFlow.value = Pair(uri, previewBitmap)
-                                }
-                            }
+    //Check if there's a LUT to apply
+    private fun processCapture(file: File){
+        when {
+            filmResource != null -> {
+                val ffmpeg = FFMpegHaldCLUT(context)
+                ffmpeg.process(filmResource!!, file){ filteredFile, error ->
+                    if(error != null){
+                        //todo - handle
+                        println("error: $error")
+                    }else{
+                        if(filteredFile != null){
+                            resize(filteredFile)
+                        }else{
+                            //todo - handle
+                            println("error: hald clut file is null")
                         }
                     }
                 }
             }
-        }else{
+            else -> resize(file)
+        }
+    }
+
+    //3. Resize
+    private fun resize(file: File){
+        if(doDesqueeze){
             processBitmap(file, scaleFactor, useNativeToolkit) { desqueezedBitmap ->
                 exportImage(desqueezedBitmap){ uri, error ->
                     when {
@@ -110,6 +114,19 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
                     }
                 }
             }
+        }else{
+            val bitmap = BitmapFactory.decodeStream(file.inputStream())
+            exportImage(bitmap){ uri, error ->
+                when {
+                    error != null -> errorStateFlow.value = "Tirwedd save capture error: $error"
+                    else -> {
+                        println("Tirwedd save capture uri: $uri")
+                        //todo - create smaller image with correct ratio...
+                        val previewBitmap = Bitmap.createScaledBitmap(bitmap, 200, 100, true)
+                        exportedPreviewStateFlow.value = Pair(uri, previewBitmap)
+                    }
+                }
+            }
         }
     }
 
@@ -119,7 +136,10 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
 
         val now = OffsetDateTime.now()
 
-        val filename = "tirwedd_${deviceName()}_${now.toEpochSecond()}.jpg"
+        val filename = when (filmLabel) {
+            null -> "tirwedd_${deviceName()}_${now.toEpochSecond()}.jpg"
+            else -> "tirwedd_${filmLabel}_${deviceName()}_${now.toEpochSecond()}.jpg"
+        }
 
         values.put(MediaStore.Images.Media.TITLE, filename)
         values.put(MediaStore.Images.Media.DISPLAY_NAME, filename)
@@ -198,8 +218,6 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         file.inputStream().use { inputStream ->
             val squeezedBitmap = BitmapFactory.decodeStream(inputStream)
 
-            if(doDesqueeze) {
-
                 val targetWidth = (squeezedBitmap.width * scale).toInt()
                 val targetHeight = squeezedBitmap.height
 
@@ -213,9 +231,6 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
                     squeezedBitmap.recycle()
                     onDesqueezed(desqueezedBitmap)
                 }
-            }else{
-                onDesqueezed(squeezedBitmap)
-            }
         }
     }
 
@@ -231,6 +246,8 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         outputFile.outputStream().use{ outputStream ->
             targetHaldImage.bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
         }
+
+        targetHaldImage.bitmap?.recycle()
 
         onSaved(outputFile)
     }

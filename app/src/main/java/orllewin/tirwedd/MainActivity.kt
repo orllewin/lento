@@ -167,6 +167,7 @@ class MainActivity : AppCompatActivity() {
         binding.filmLayout.setOnClickListener {
             FilmSelectionDialog(this){ resId, label ->
                 imageProcessor.filmResource = resId
+                imageProcessor.filmLabel = label
                 binding.selectedFilmLabel.text = label
             }.show()
         }
