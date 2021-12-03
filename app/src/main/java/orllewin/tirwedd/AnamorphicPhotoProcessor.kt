@@ -145,7 +145,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
 
         val filename = when (filmLabel) {
             null -> "tirwedd_${deviceName()}_${now.toEpochSecond()}.jpg"
-            else -> "tirwedd_${filmLabel}_${deviceName()}_${now.toEpochSecond()}.jpg"
+            else -> "tirwedd_${filmLabel!!.lowercase().replace(" ", "_")}_${deviceName()}_${now.toEpochSecond()}.jpg"
         }
 
         values.put(MediaStore.Images.Media.TITLE, filename)
@@ -205,59 +205,28 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         }
     }
 
-    /**
-     * Desqueezes a photo from a File
-     */
-    private fun _processBitmap(file: File, scale: Float, nativeToolkit: Boolean, onDesqueezed: (desqueezed: Bitmap) -> Unit){
-        lifecycleScope.launch(Dispatchers.IO) {
-            when {
-                filmResource != null -> {
-                    _applyFilter(context, file){ filteredFile ->
-                        desqueeze(filteredFile, scale, nativeToolkit, onDesqueezed)
-                    }
-                }
-                else -> desqueeze(file, scale, nativeToolkit, onDesqueezed)
-            }
-        }
-    }
-
     private fun desqueeze(file: File, scale: Float, nativeToolkit: Boolean, onDesqueezed: (desqueezed: Bitmap) -> Unit){
         file.inputStream().use { inputStream ->
             val squeezedBitmap = BitmapFactory.decodeStream(inputStream)
 
-                val targetWidth = (squeezedBitmap.width * scale).toInt()
-                val targetHeight = squeezedBitmap.height
+            val targetWidth = (squeezedBitmap.width * scale).toInt()
+            val targetHeight = squeezedBitmap.height
 
-                if (nativeToolkit) {
+            when {
+                nativeToolkit -> {
                     val desqueezedBitmap = Toolkit.resize(squeezedBitmap, targetWidth, targetHeight)
                     squeezedBitmap.recycle()
                     onDesqueezed(desqueezedBitmap)
-                } else {
-                    val desqueezedBitmap =
-                        Bitmap.createScaledBitmap(squeezedBitmap, targetWidth, targetHeight, true)
+                }
+                else -> {
+                    val desqueezedBitmap = Bitmap.createScaledBitmap(squeezedBitmap, targetWidth, targetHeight, true)
                     squeezedBitmap.recycle()
                     onDesqueezed(desqueezedBitmap)
                 }
+            }
         }
     }
 
-    private fun _applyFilter(context: Context, source: File, onSaved: (file: File) -> Unit){
-        val targetHaldImage = AndroidTargetHaldImage(source)
-
-        val haldClutImage = AndroidHaldCLUTImage(context, filmResource!!)
-
-        HaldClut(haldClutImage, targetHaldImage).process()
-
-        val outputFile = File.createTempFile("temp_filtered_hald", ".png", context.cacheDir)
-
-        outputFile.outputStream().use{ outputStream ->
-            targetHaldImage.bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-        }
-
-        targetHaldImage.bitmap?.recycle()
-
-        onSaved(outputFile)
-    }
 
     private fun deviceName(): String = Build.MODEL.lowercase().replace(" ", "_")
 }
