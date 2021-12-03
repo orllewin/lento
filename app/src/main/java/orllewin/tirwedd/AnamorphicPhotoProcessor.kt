@@ -100,34 +100,41 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
 
     //3. Resize
     private fun resize(file: File){
-        if(doDesqueeze){
-            processBitmap(file, scaleFactor, useNativeToolkit) { desqueezedBitmap ->
-                exportImage(desqueezedBitmap){ uri, error ->
-                    when {
-                        error != null -> errorStateFlow.value = "Tirwedd save capture error: $error"
-                        else -> {
-                            println("Tirwedd save capture uri: $uri")
-                            //todo - create smaller image with correct ratio...
-                            val previewBitmap = Bitmap.createScaledBitmap(desqueezedBitmap, 200, 100, true)
-                            exportedPreviewStateFlow.value = Pair(uri, previewBitmap)
+        when {
+            doDesqueeze -> {
+                desqueeze(file, scaleFactor, useNativeToolkit) { desqueezedBitmap ->
+                    exportImage(desqueezedBitmap){ uri, error ->
+                        when {
+                            error != null -> errorStateFlow.value = "Tirwedd save capture error: $error"
+                            else -> generatePreview(uri, desqueezedBitmap)
                         }
                     }
                 }
             }
-        }else{
-            val bitmap = BitmapFactory.decodeStream(file.inputStream())
-            exportImage(bitmap){ uri, error ->
-                when {
-                    error != null -> errorStateFlow.value = "Tirwedd save capture error: $error"
-                    else -> {
-                        println("Tirwedd save capture uri: $uri")
-                        //todo - create smaller image with correct ratio...
-                        val previewBitmap = Bitmap.createScaledBitmap(bitmap, 200, 100, true)
-                        exportedPreviewStateFlow.value = Pair(uri, previewBitmap)
+            else -> {
+                val bitmap = BitmapFactory.decodeStream(file.inputStream())
+                exportImage(bitmap){ uri, error ->
+                    when {
+                        error != null -> errorStateFlow.value = "Tirwedd save capture error: $error"
+                        else -> generatePreview(uri, bitmap)
                     }
                 }
             }
         }
+    }
+
+    //4. Build small preview
+    private fun generatePreview(uri: Uri?, bitmap: Bitmap){
+        if(uri == null){
+            println("generatePreview() missing file Uri")
+            return
+        }
+        println("Tirwedd save capture uri: $uri")
+        //todo - create smaller image with correct ratio...
+        val previewBitmap = Bitmap.createScaledBitmap(bitmap, 200, 100, true)
+        exportedPreviewStateFlow.value = Pair(uri, previewBitmap)
+
+        bitmap.recycle()
     }
 
     private fun exportImage(image: Bitmap, onExported: (uri: Uri?, error: String?) -> Unit){
@@ -201,11 +208,11 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
     /**
      * Desqueezes a photo from a File
      */
-    private fun processBitmap(file: File, scale: Float, nativeToolkit: Boolean, onDesqueezed: (desqueezed: Bitmap) -> Unit){
+    private fun _processBitmap(file: File, scale: Float, nativeToolkit: Boolean, onDesqueezed: (desqueezed: Bitmap) -> Unit){
         lifecycleScope.launch(Dispatchers.IO) {
             when {
                 filmResource != null -> {
-                    applyFilter(context, file){ filteredFile ->
+                    _applyFilter(context, file){ filteredFile ->
                         desqueeze(filteredFile, scale, nativeToolkit, onDesqueezed)
                     }
                 }
@@ -234,7 +241,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         }
     }
 
-    private fun applyFilter(context: Context, source: File, onSaved: (file: File) -> Unit){
+    private fun _applyFilter(context: Context, source: File, onSaved: (file: File) -> Unit){
         val targetHaldImage = AndroidTargetHaldImage(source)
 
         val haldClutImage = AndroidHaldCLUTImage(context, filmResource!!)
