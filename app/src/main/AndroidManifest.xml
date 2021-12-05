@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="orllewin.tirwedd">
+    package="orllewin.lento">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -17,9 +17,9 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Tirwedd">
+        android:theme="@style/Theme_Lento">
         <activity
-            android:name=".MainActivity"
+            android:name="orllewin.lento.MainActivity"
             android:exported="true"
             android:screenOrientation="landscape">
             <intent-filter>
@@ -30,7 +30,7 @@
         </activity>
 
         <activity
-            android:name=".SettingsActivity"
+            android:name="orllewin.lento.SettingsActivity"
             android:exported="true"
             android:label="@string/title_activity_settings"
             android:theme="@style/Theme.Settings"/>

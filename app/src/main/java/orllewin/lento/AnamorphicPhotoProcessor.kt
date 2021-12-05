@@ -1,4 +1,4 @@
-package orllewin.tirwedd
+package orllewin.lento
 
 import android.content.ContentValues
 import android.content.Context
@@ -12,13 +12,8 @@ import androidx.camera.core.ImageCaptureException
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.renderscript.Toolkit
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import orllewin.haldclut.FFMpegHaldCLUT
-import orllewin.haldclut.HaldClut
-import orllewin.tirwedd.hald.AndroidHaldCLUTImage
-import orllewin.tirwedd.hald.AndroidTargetHaldImage
 import java.io.File
 import java.time.OffsetDateTime
 
@@ -60,13 +55,13 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
             return
         }
 
-        val cacheFile = File.createTempFile("tirwedd_temp_capture", ".jpg", cacheDir)
+        val cacheFile = File.createTempFile("lento_temp_capture", ".jpg", cacheDir)
 
         val outputOptions = ImageCapture.OutputFileOptions.Builder(cacheFile).build()
         imageCapture?.takePicture(
             outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
-                    errorStateFlow.value = "Tirwedd cameraX capture exception: ${exc.message}"
+                    errorStateFlow.value = "Lento cameraX capture exception: ${exc.message}"
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
@@ -105,7 +100,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
                 desqueeze(file, scaleFactor, useNativeToolkit) { desqueezedBitmap ->
                     exportImage(desqueezedBitmap){ uri, error ->
                         when {
-                            error != null -> errorStateFlow.value = "Tirwedd save capture error: $error"
+                            error != null -> errorStateFlow.value = "Lento save capture error: $error"
                             else -> generatePreview(uri, desqueezedBitmap)
                         }
                     }
@@ -115,7 +110,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
                 val bitmap = BitmapFactory.decodeStream(file.inputStream())
                 exportImage(bitmap){ uri, error ->
                     when {
-                        error != null -> errorStateFlow.value = "Tirwedd save capture error: $error"
+                        error != null -> errorStateFlow.value = "Lento save capture error: $error"
                         else -> generatePreview(uri, bitmap)
                     }
                 }
@@ -129,7 +124,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
             println("generatePreview() missing file Uri")
             return
         }
-        println("Tirwedd save capture uri: $uri")
+        println("Lento save capture uri: $uri")
         //todo - create smaller image with correct ratio...
         val previewBitmap = Bitmap.createScaledBitmap(bitmap, 200, 100, true)
         exportedPreviewStateFlow.value = Pair(uri, previewBitmap)
@@ -144,8 +139,8 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         val now = OffsetDateTime.now()
 
         val filename = when (filmLabel) {
-            null -> "tirwedd_${deviceName()}_${now.toEpochSecond()}.jpg"
-            else -> "tirwedd_${filmLabel!!.lowercase().replace(" ", "_")}_${deviceName()}_${now.toEpochSecond()}.jpg"
+            null -> "lento_${deviceName()}_${now.toEpochSecond()}.jpg"
+            else -> "lento_${filmLabel!!.lowercase().replace(" ", "_")}_${deviceName()}_${now.toEpochSecond()}.jpg"
         }
 
         values.put(MediaStore.Images.Media.TITLE, filename)
@@ -154,7 +149,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Tirwedd")
+            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Lento")
             values.put(MediaStore.Images.Media.IS_PENDING, true)
         }
 

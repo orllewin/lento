@@ -1,20 +1,16 @@
-package orllewin.tirwedd
+package orllewin.lento
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
 import androidx.core.view.children
-import androidx.core.view.marginEnd
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import orllewin.extensions.toPixels
-import orllewin.tirwedd.databinding.DialogFilmSelectionBinding
+import orllewin.lento.databinding.DialogFilmSelectionBinding
 
 class FilmSelectionDialog(val context: Context, val onFilmSelect: (resId: Int?, label: String?) -> Unit): View.OnClickListener {
 

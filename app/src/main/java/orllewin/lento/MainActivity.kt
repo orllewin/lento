@@ -1,4 +1,4 @@
-package orllewin.tirwedd
+package orllewin.lento
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -23,17 +23,15 @@ import androidx.core.view.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.PreferenceManager
-import com.google.android.material.chip.Chip
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import orllewin.extensions.*
 import orllewin.file_io.CameraIO
 import orllewin.file_io.OppenFileIO
-import orllewin.tirwedd.databinding.ActivityMainBinding
+import orllewin.lento.databinding.ActivityMainBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import android.R.string.no
 
 class MainActivity : AppCompatActivity() {
 

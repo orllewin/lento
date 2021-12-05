@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.Tirwedd" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme_Lento" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/eigenlicht</item>
         <item name="colorPrimaryVariant">@color/eigenlicht</item>
         <item name="colorOnPrimary">@color/black</item>

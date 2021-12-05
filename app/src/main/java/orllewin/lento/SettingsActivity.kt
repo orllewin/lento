@@ -1,7 +1,6 @@
-package orllewin.tirwedd
+package orllewin.lento
 
 import android.os.Bundle
-import android.text.InputType
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity

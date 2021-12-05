@@ -1,11 +1,11 @@
-package orllewin.tirwedd
+package orllewin.lento
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import orllewin.tirwedd.databinding.DialogFirstRunBinding
+import orllewin.lento.databinding.DialogFirstRunBinding
 
 class FirstRunDialog(context: Context) {
 

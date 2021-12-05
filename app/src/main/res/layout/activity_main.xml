@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="viewmodel" type="orllewin.tirwedd.MainViewModel" />
+        <variable name="viewmodel" type="orllewin.lento.MainViewModel" />
     </data>
 
     <RelativeLayout
@@ -22,7 +22,7 @@
             android:scaleX="1.33"
             app:scaleType="fitCenter" />
 
-        <orllewin.tirwedd.views.ShutterView
+        <orllewin.lento.views.ShutterView
             android:id="@+id/shutter"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

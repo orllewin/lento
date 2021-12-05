@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Tirwedd</string>
+    <string name="app_name">Lento</string>
 
     <string name="title_activity_settings">Settings</string>
 
@@ -15,5 +15,5 @@
     <string name="export">Add to Photos</string>
     <string name="menu">Menu</string>
     <string name="disclaimer_button">I understand</string>
-    <string name="disclaimer">Tirwedd is primarily meant as a specialist camera for use with a hardware anamorphic lens attached and is written by a solo developer. Android camera apps are notorious for being difficult to develop and I only have access to a couple of devices for testing. If Tirwedd doesn\'t work on your device please request a refund immediately</string>
+    <string name="disclaimer">Lento is primarily meant as a specialist camera for use with a hardware anamorphic lens attached and is written by a solo developer. Android camera apps are notorious for being difficult to develop and I only have access to a couple of devices for testing. If Lento doesn\'t work on your device please request a refund immediately</string>
 </resources>

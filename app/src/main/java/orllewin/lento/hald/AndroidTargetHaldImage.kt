@@ -1,6 +1,5 @@
-package orllewin.tirwedd.hald
+package orllewin.lento.hald
 
-import android.content.Context
 import android.graphics.Bitmap
 import orllewin.file_io.ImageIO
 import orllewin.haldclut.HaldImage
