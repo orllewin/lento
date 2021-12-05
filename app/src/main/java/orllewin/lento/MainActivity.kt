@@ -55,6 +55,8 @@ class MainActivity : AppCompatActivity() {
     //Level/Sensor
     var sensorManager: SensorManager? = null
 
+    var skiss: LevelSkiss? =null
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,14 +117,16 @@ class MainActivity : AppCompatActivity() {
 
         binding.overflowContainer.setOnClickListener { OverflowMenu(this, binding.overflow, viewModel.isTimerActive, {
             //onTogglelevel
-            when {
-                binding.levelSkiss.isVisible -> {
-                    binding.levelSkiss.hide()
-                    stopLevel()
-                }
-                else -> {
-                    binding.levelSkiss.show()
-                    startLevel()
+            skiss?.let{
+                when {
+                    skiss!!.drawLevel -> {
+                        skiss?.drawLevel = false
+                        stopLevel()
+                    }
+                    else -> {
+                        skiss?.drawLevel = true
+                        startLevel()
+                    }
                 }
             }
         }, {
@@ -132,6 +136,12 @@ class MainActivity : AppCompatActivity() {
                 viewModel.isTimerActive -> binding.timerIcon.show()
                 else -> binding.timerIcon.hide()
             }
+        }, {
+            //onToggleGrid
+            skiss?.let{
+                skiss!!.drawGrid = !skiss!!.drawGrid
+            }
+
         }).show() }
 
         setupCameraMode()
@@ -154,7 +164,7 @@ class MainActivity : AppCompatActivity() {
             autoFocus(null)
         }
 
-        binding.cameraxViewFinder.setOnTouchListener { view, motionEvent ->
+        binding.cameraxViewFinder.setOnTouchListener { _, motionEvent ->
             autoFocus(motionEvent)
             true
         }
@@ -258,11 +268,6 @@ class MainActivity : AppCompatActivity() {
                 toast("Tirwedd camera bind exception: $exc")
             }
 
-            delayed(1250){
-                binding.splashIcon.animate().alpha(0f).withEndAction {
-                    binding.splashIcon.hide()
-                }.duration = 500
-            }
         }, ContextCompat.getMainExecutor(this))
     }
 
@@ -416,11 +421,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun startLevel(){
 
-        val skiss = LevelSkiss(
+        skiss = LevelSkiss(
             binding.levelSkiss
         )
 
-        skiss.start()
+        skiss?.start()
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
@@ -444,7 +449,7 @@ class MainActivity : AppCompatActivity() {
                         val pitch = orientation[1]
                         //val roll = orientation[2]
                         val pitchDegrees = Math.toDegrees(pitch.toDouble())
-                        skiss.setDegrees(pitchDegrees)
+                        skiss?.setDegrees(pitchDegrees)
                     }
                 }
             }

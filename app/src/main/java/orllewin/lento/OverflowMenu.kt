@@ -7,7 +7,13 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 
-class OverflowMenu(private val context: Context, view: View, timerActive: Boolean, onToggleLevel: () -> Unit, onTimerToggle: () -> Unit) {
+class OverflowMenu(
+    private val context: Context,
+    view: View,
+    timerActive: Boolean,
+    onToggleLevel: () -> Unit,
+    onTimerToggle: () -> Unit,
+    onToggleGrid: () -> Unit) {
 
     private val popup = PopupMenu(context, view)
 
@@ -34,6 +40,12 @@ class OverflowMenu(private val context: Context, view: View, timerActive: Boolea
         val levelItem = popup.menu.add("Toggle level")
         levelItem.setOnMenuItemClickListener {
             onToggleLevel()
+            true
+        }
+
+        val gridItem = popup.menu.add("Toggle grid")
+        gridItem.setOnMenuItemClickListener {
+            onToggleGrid()
             true
         }
 

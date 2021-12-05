@@ -39,10 +39,10 @@ class FilmSelectionDialog(val context: Context, val onFilmSelect: (resId: Int?, 
             binding.flexBoxColour.addView(chip)
         }
 
-        binding.flexBoxColour.children.iterator().forEach { view ->
-            val lp = view.layoutParams as FlexboxLayout.LayoutParams
+        binding.flexBoxColour.children.iterator().forEach { chip ->
+            val lp = chip.layoutParams as FlexboxLayout.LayoutParams
             lp.setMargins(0, 0, 8.toPixels(), 0)
-            view.layoutParams = lp
+            chip.layoutParams = lp
         }
 
         //End of colour
@@ -64,10 +64,10 @@ class FilmSelectionDialog(val context: Context, val onFilmSelect: (resId: Int?, 
             binding.flexBoxBw.addView(chip)
         }
 
-        binding.flexBoxBw.children.iterator().forEach { view ->
-            val lp = view.layoutParams as FlexboxLayout.LayoutParams
+        binding.flexBoxBw.children.iterator().forEach { chip ->
+            val lp = chip.layoutParams as FlexboxLayout.LayoutParams
             lp.setMargins(0, 0, 8.toPixels(), 0)
-            view.layoutParams = lp
+            chip.layoutParams = lp
         }
 
         //End of monochrome
@@ -89,10 +89,10 @@ class FilmSelectionDialog(val context: Context, val onFilmSelect: (resId: Int?, 
             binding.flexBoxMisc.addView(chip)
         }
 
-        binding.flexBoxMisc.children.iterator().forEach { view ->
-            val lp = view.layoutParams as FlexboxLayout.LayoutParams
+        binding.flexBoxMisc.children.iterator().forEach { chip ->
+            val lp = chip.layoutParams as FlexboxLayout.LayoutParams
             lp.setMargins(0, 0, 8.toPixels(), 0)
-            view.layoutParams = lp
+            chip.layoutParams = lp
         }
 
         //End of misc

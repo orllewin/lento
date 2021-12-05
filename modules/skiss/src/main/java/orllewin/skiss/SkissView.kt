@@ -27,7 +27,7 @@ class SkissView @JvmOverloads constructor(
     private var initialised = false
     private var hardwareAccCheckRequired = true
 
-    init {
+    fun initTouch(){
         setOnTouchListener{ _, motionEvent ->
             when (motionEvent!!.action and MotionEvent.ACTION_MASK){
                 MotionEvent.ACTION_DOWN -> {
@@ -56,6 +56,10 @@ class SkissView @JvmOverloads constructor(
 
     fun update(onDraw: (canvas: Canvas?) -> Unit?){
         this.onDraw = onDraw
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return false
     }
 
     fun onTouch(onTouch: (x: Int, y: Int) -> Unit){
