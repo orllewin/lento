@@ -263,7 +263,7 @@ class MainActivity : AppCompatActivity() {
 
             imageProcessor.setup(imageCapture)
 
-            imageCapture?.flashMode = ImageCapture.FLASH_MODE_OFF
+            imageCapture?.flashMode = config.flashMode
 
             updateAspectRatioLabel()
 
@@ -375,19 +375,39 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBorderChips(){
+        when(config.borderMode){
+            AnamorphicPhotoProcessor.BorderNone -> {
+                binding.borderInner.setImageResource(R.drawable.vector_border_none)
+                imageProcessor.borderMode = AnamorphicPhotoProcessor.BorderNone
+                binding.borderNone.isChecked = true
+            }
+            AnamorphicPhotoProcessor.BorderBlack -> {
+                binding.borderInner.setImageResource(R.drawable.vector_border_black)
+                imageProcessor.borderMode = AnamorphicPhotoProcessor.BorderBlack
+                binding.borderBlack.isChecked = true
+            }
+            AnamorphicPhotoProcessor.BorderWhite -> {
+                binding.borderInner.setImageResource(R.drawable.vector_border_white)
+                imageProcessor.borderMode = AnamorphicPhotoProcessor.BorderWhite
+                binding.borderWhite.isChecked = true
+            }
+        }
         binding.borderGroup.setOnCheckedChangeListener{ _, checkedId ->
             when(checkedId){
                 R.id.border_none -> {
+                    config.setBorderMode(this, AnamorphicPhotoProcessor.BorderNone)
                     binding.borderInner.setImageResource(R.drawable.vector_border_none)
-                    imageProcessor.borderMode = AnamorphicPhotoProcessor.Border.None
+                    imageProcessor.borderMode = AnamorphicPhotoProcessor.BorderNone
                 }
                 R.id.border_black -> {
+                    config.setBorderMode(this, AnamorphicPhotoProcessor.BorderBlack)
                     binding.borderInner.setImageResource(R.drawable.vector_border_black)
-                    imageProcessor.borderMode = AnamorphicPhotoProcessor.Border.Black
+                    imageProcessor.borderMode = AnamorphicPhotoProcessor.BorderBlack
                 }
                 R.id.border_white -> {
+                    config.setBorderMode(this, AnamorphicPhotoProcessor.BorderWhite)
                     binding.borderInner.setImageResource(R.drawable.vector_border_white)
-                    imageProcessor.borderMode = AnamorphicPhotoProcessor.Border.White
+                    imageProcessor.borderMode = AnamorphicPhotoProcessor.BorderWhite
                 }
             }
             toggleBorderSelect()
@@ -395,21 +415,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupFlashChips(){
+        when(config.flashMode){
+            ImageCapture.FLASH_MODE_ON -> {
+                binding.flashInner.setImageResource(R.drawable.vector_flash_on)
+                binding.chipFlashOn.isChecked = true
+            }
+            ImageCapture.FLASH_MODE_OFF -> {
+                binding.flashInner.setImageResource(R.drawable.vector_flash_off)
+                binding.chipFlashOff.isChecked = true
+            }
+            ImageCapture.FLASH_MODE_AUTO -> {
+                binding.flashInner.setImageResource(R.drawable.vector_flash_auto)
+                binding.chipFlashAuto.isChecked = true
+            }
+        }
+
         binding.flashGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.chip_flash_on -> {
-                    imageCapture?.flashMode = ImageCapture.FLASH_MODE_ON
+                    config.setFlashMode(this, ImageCapture.FLASH_MODE_ON)
                     binding.flashInner.setImageResource(R.drawable.vector_flash_on)
                 }
                 R.id.chip_flash_off -> {
-                    imageCapture?.flashMode = ImageCapture.FLASH_MODE_OFF
+                    config.setFlashMode(this, ImageCapture.FLASH_MODE_OFF)
                     binding.flashInner.setImageResource(R.drawable.vector_flash_off)
                 }
                 R.id.chip_flash_auto -> {
-                    imageCapture?.flashMode = ImageCapture.FLASH_MODE_AUTO
+                    config.setFlashMode(this, ImageCapture.FLASH_MODE_AUTO)
                     binding.flashInner.setImageResource(R.drawable.vector_flash_auto)
                 }
             }
+            imageCapture?.flashMode = config.flashMode
             toggleFlashMode()
         }
     }

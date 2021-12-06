@@ -2,6 +2,7 @@ package orllewin.lento
 
 import android.content.Context
 import androidx.camera.core.AspectRatio
+import androidx.camera.core.ImageCapture
 import androidx.preference.PreferenceManager
 
 class CameraConfig(
@@ -11,7 +12,9 @@ class CameraConfig(
     var aspectRatioFlag: Int = AspectRatio.RATIO_16_9,
     var zoomLevel: Int = 1,
     var lutResource: Int = -1,
-    var lutLabel: String = ""
+    var lutLabel: String = "",
+    var flashMode: Int = ImageCapture.FLASH_MODE_OFF,
+    var borderMode: Int = AnamorphicPhotoProcessor.BorderNone
 ){
     private constructor(builder: Builder) : this(
         isFirstRun = builder.isFirstRun ?: true,
@@ -20,7 +23,10 @@ class CameraConfig(
         aspectRatioFlag = builder.aspectRatioFlag ?: AspectRatio.RATIO_16_9,
         zoomLevel = builder.zoomLevel ?: 1,
         lutResource = builder.lutResource ?: -1,
-        lutLabel = builder.lutLabel ?: ""
+        lutLabel = builder.lutLabel,
+        flashMode = builder.flashMode,
+        borderMode = builder.borderMode
+
     )
 
     companion object {
@@ -36,6 +42,8 @@ class CameraConfig(
             editor.putInt("zoomLevel", config.zoomLevel)
             editor.putInt("lutResource", config.lutResource)
             editor.putString("lutLabel", config.lutLabel)
+            editor.putInt("flashMode", config.flashMode)
+            editor.putInt("borderMode", config.borderMode)
             editor.apply()
         }
 
@@ -49,6 +57,8 @@ class CameraConfig(
             builder.zoomLevel = prefs.getInt("zoomLevel", 1)
             builder.lutResource = prefs.getInt("lutResource", -1)
             builder.lutLabel = prefs.getString("lutLabel", "") ?: ""
+            builder.flashMode = prefs.getInt("flashMode", ImageCapture.FLASH_MODE_OFF)
+            builder.borderMode = prefs.getInt("borderMode", AnamorphicPhotoProcessor.BorderNone)
             return builder.build()
         }
     }
@@ -61,6 +71,8 @@ class CameraConfig(
         var zoomLevel: Int? = 1
         var lutResource: Int? = -1
         var lutLabel: String = ""
+        var flashMode: Int = ImageCapture.FLASH_MODE_OFF
+        var borderMode: Int = AnamorphicPhotoProcessor.BorderNone
         fun build() = CameraConfig(this)
     }
 
@@ -92,6 +104,16 @@ class CameraConfig(
     fun setLut(context: Context, lutResource: Int?, lutLabel: String){
         this.lutResource = lutResource ?: -1
         this.lutLabel = lutLabel
+        put(context, this)
+    }
+
+    fun setFlashMode(context: Context, flashMode: Int){
+        this.flashMode = flashMode
+        put(context, this)
+    }
+
+    fun setBorderMode(context: Context, borderMode: Int){
+        this.borderMode = borderMode
         put(context, this)
     }
 

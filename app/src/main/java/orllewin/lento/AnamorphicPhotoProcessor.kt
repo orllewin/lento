@@ -32,13 +32,13 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
     var filmResource: Int? = null
     var filmLabel: String? = null
 
-    sealed class Border{
-        object None: Border()
-        object Black: Border()
-        object White: Border()
+    companion object{
+        const val BorderNone = 0
+        const val BorderBlack = 1
+        const val BorderWhite = 2
     }
 
-    var borderMode: Border = Border.None
+    var borderMode = BorderNone
 
 
     private var imageCapture: ImageCapture? = null
@@ -161,7 +161,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         val uri = contentResolver.insert(collection, values)
 
         uri?.let {
-            if(borderMode == Border.None){
+            if(borderMode == BorderNone){
                 this.contentResolver.openOutputStream(uri)?.use { outputStream ->
                     outputStream.use { os ->
                         image.compress(Bitmap.CompressFormat.JPEG, 100, os)
@@ -175,7 +175,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
                 val canvas = Canvas(letterBoxed)
 
                 val color = when (borderMode) {
-                    Border.White -> Color.WHITE
+                    BorderWhite -> Color.WHITE
                     else -> Color.BLACK
                 }
                 canvas.drawColor(color)
