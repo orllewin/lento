@@ -1,40 +1,87 @@
 package orllewin.lento
 
 import android.content.Context
-import android.content.SharedPreferences
+import androidx.camera.core.AspectRatio
 import androidx.preference.PreferenceManager
-import orllewin.extensions.getBooleanPref
-import orllewin.extensions.putBooleanPref
 
 class CameraConfig(
-    var isAnamorphic: Boolean = true
+    var isFirstRun: Boolean = true,
+    var isAnamorphic: Boolean = true,
+    var anamorphicScaleFactor: Float = 1.33f,
+    var aspectRatioFlag: Int = AspectRatio.RATIO_16_9,
+    var zoomLevel: Int = 1
 ){
     private constructor(builder: Builder) : this(
-        isAnamorphic = builder.isAnamorphic ?: true
+        isFirstRun = builder.isFirstRun ?: true,
+        isAnamorphic = builder.isAnamorphic ?: true,
+        anamorphicScaleFactor = builder.anamorphicScaleFactor ?: 1.33f,
+        aspectRatioFlag = builder.aspectRatioFlag ?: AspectRatio.RATIO_16_9,
+        zoomLevel = builder.zoomLevel ?: 1
     )
 
     companion object {
-        inline fun build(block: Builder.() -> Unit) = Builder().apply(block).build()
+        //inline fun build(block: Builder.() -> Unit) = Builder().apply(block).build()
 
         fun put(context: Context, config: CameraConfig){
             val prefs = PreferenceManager.getDefaultSharedPreferences(context)
             val editor = prefs.edit()
+            editor.putBoolean("isFirstRun", config.isFirstRun)
             editor.putBoolean("isAnamorphic", config.isAnamorphic)
-
+            editor.putFloat("anamorphicScaleFactor", config.anamorphicScaleFactor)
+            editor.putInt("aspectRatioFlag", config.aspectRatioFlag)
+            editor.putInt("zoomLevel", config.zoomLevel)
             editor.apply()
         }
 
         fun get(context: Context): CameraConfig{
             val prefs = PreferenceManager.getDefaultSharedPreferences(context)
             val builder = Builder()
-            builder.isAnamorphic = prefs.getBoolean("isAnamorphic",true)
-
+            builder.isFirstRun = prefs.getBoolean("isFirstRun", true)
+            builder.isAnamorphic = prefs.getBoolean("isAnamorphic", false)
+            builder.anamorphicScaleFactor = prefs.getFloat("anamorphicScaleFactor", 1.33f)
+            builder.aspectRatioFlag = prefs.getInt("aspectRatioFlag", AspectRatio.RATIO_16_9)
+            builder.zoomLevel = prefs.getInt("zoomLevel", 1)
             return builder.build()
         }
     }
 
     class Builder {
+        var isFirstRun: Boolean? = null
         var isAnamorphic: Boolean? = null
+        var anamorphicScaleFactor: Float? = 1.33f
+        var aspectRatioFlag: Int? = AspectRatio.RATIO_16_9
+        var zoomLevel: Int? = 1
         fun build() = CameraConfig(this)
+    }
+
+    fun hasRan(context: Context){
+        this.isFirstRun = false
+        put(context, this)
+    }
+
+    fun setAnamorphic(context: Context, isAnamorphic: Boolean){
+        this.isAnamorphic = isAnamorphic
+        put(context, this)
+    }
+
+    fun setAnamorphicScaleFactor(context: Context, anamorphicScaleFactor: Float){
+        this.anamorphicScaleFactor = anamorphicScaleFactor
+        put(context, this)
+    }
+
+    fun setAspectRatio(context: Context, aspectRatioFlag: Int){
+        this.aspectRatioFlag = aspectRatioFlag
+        put(context, this)
+    }
+
+    fun setZoomLevel(context: Context, zoomLevel: Int){
+        this.zoomLevel = zoomLevel
+        put(context, this)
+    }
+
+    fun logAspectRatio() = when (aspectRatioFlag) {
+        AspectRatio.RATIO_4_3 -> println("aspectRatioFlag: RATIO_4_3")
+        AspectRatio.RATIO_16_9 -> println("aspectRatioFlag: RATIO_16_9")
+        else -> println("aspectRatioFlag: UNKNOWN")
     }
 }

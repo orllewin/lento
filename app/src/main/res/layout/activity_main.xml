@@ -378,10 +378,10 @@
             android:id="@+id/level_skiss"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_centerInParent="true"
             android:clickable="false"
             android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:layout_centerInParent="true"/>
+            android:focusableInTouchMode="false" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/hud_message"

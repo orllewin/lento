@@ -38,8 +38,6 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
 
-    private var aspectRatio = RATIO_16_9
-
     private var fileIO = OppenFileIO()
     private var cameraIO = CameraIO()
     private lateinit var imageProcessor: AnamorphicPhotoProcessor
@@ -50,16 +48,22 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
 
     private var camera: Camera? = null
-    private var zoomRatio = 1f
 
     //Level/Sensor
-    var sensorManager: SensorManager? = null
+    private var sensorManager: SensorManager? = null
+    private var gravityValues: FloatArray? = null
+    private var magneticValues: FloatArray? = null
+    private var levelListener: SensorEventListener? = null
 
-    var skiss: LevelSkiss? =null
+    private var skiss: LevelSkiss? =null
+
+    lateinit var config: CameraConfig
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        config = CameraConfig.get(this)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
@@ -154,21 +158,16 @@ class MainActivity : AppCompatActivity() {
 
         setupCameraMode()
 
+        updateZoomLevelUI()
         binding.zoomLayout.setOnClickListener {
-            zoomRatio = when (zoomRatio) {
-                1f -> {
-                    binding.zoomInner.setImageResource(R.drawable.vector_zoom_out)
-                    binding.zoomLabel.text = "2x"
-                    2f
-                }
-                else -> {
-                    binding.zoomInner.setImageResource(R.drawable.vector_zoom_in)
-                    binding.zoomLabel.text = "1x"
-                    1f
-                }
+            when (config.zoomLevel) {
+                1 -> config.setZoomLevel(this, 2)
+                else -> config.setZoomLevel(this, 1)
             }
 
-            camera?.cameraControl?.setZoomRatio(zoomRatio)
+            updateZoomLevelUI()
+
+            camera?.cameraControl?.setZoomRatio(config.zoomLevel.toFloat())
             autoFocus(null)
         }
 
@@ -204,7 +203,7 @@ class MainActivity : AppCompatActivity() {
         when {
             !fileIO.hasPermissions(this) -> requestFileIOPermissions()
             !cameraIO.hasPermissions(this) -> requestCameraIOPermissions()
-            else -> initialiseCamera(aspectRatio)
+            else -> initialiseCamera()
         }
     }
 
@@ -220,7 +219,7 @@ class MainActivity : AppCompatActivity() {
     private fun requestCameraIOPermissions(){
         cameraIO.requestPermissions { granted ->
             when {
-                granted -> initialiseCamera(aspectRatio)
+                granted -> initialiseCamera()
                 else -> toast("Camera permission required")
             }
         }
@@ -235,42 +234,44 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toggleAspectRatio(){
-        aspectRatio = when (aspectRatio) {
-            RATIO_16_9 -> RATIO_4_3
-            else -> RATIO_16_9
+        if(config.aspectRatioFlag == RATIO_4_3){
+            config.setAspectRatio(this, RATIO_16_9)
+        }else{
+            config.setAspectRatio(this, RATIO_4_3)
         }
 
-        initialiseCamera(aspectRatio)
+        initialiseCamera()
     }
 
-    private fun initialiseCamera(aspectRatio: Int) {
+    private fun initialiseCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
+            println("aspectRatio initialiseCamera()")
+            config.logAspectRatio()
+
             val preview = Preview.Builder()
-                .setTargetAspectRatio(aspectRatio)
+                .setTargetAspectRatio(config.aspectRatioFlag)
                 .build()
             preview.setSurfaceProvider(binding.cameraxViewFinder.surfaceProvider)
 
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
-                .setTargetAspectRatio(aspectRatio)
+                .setTargetAspectRatio(config.aspectRatioFlag)
                 .build()
 
             imageProcessor.setup(imageCapture)
 
             imageCapture?.flashMode = ImageCapture.FLASH_MODE_OFF
 
-            when(aspectRatio){
-                RATIO_16_9 -> binding.aspectRatioLabel.text = "2.40:1"
-                RATIO_4_3 -> binding.aspectRatioLabel.text = "16:9"
-            }
+            updateAspectRatioLabel()
 
             try {
                 cameraProvider.unbindAll()
                 camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+                camera?.cameraControl?.setZoomRatio(config.zoomLevel.toFloat())
                 autoFocus(null)
             } catch(exc: Exception) {
                 toast("Tirwedd camera bind exception: $exc")
@@ -289,11 +290,15 @@ class MainActivity : AppCompatActivity() {
             }
         }, 100L)
 
-        val scaleFactor = PreferenceManager.getDefaultSharedPreferences(this).getString("horizontal_scale_factor", "1.33")!!.toFloat()
-        binding.cameraxViewFinder.scaleX = scaleFactor
+        config = CameraConfig.get(this)
 
-        if(getBooleanPref("is_first_run", true)){
-            putBooleanPref("is_first_run", false)
+        when {
+            config.isAnamorphic -> binding.cameraxViewFinder.scaleX = config.anamorphicScaleFactor
+            else -> binding.cameraxViewFinder.scaleX = 1f
+        }
+
+        if(config.isFirstRun){
+            config.hasRan(this)
             FirstRunDialog(this).show()
         }
 
@@ -311,41 +316,50 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupCameraMode(){
-        if(getBooleanPref("mode_anamorphic", true)){
-            binding.modeSwitch.text = "Anamorphic"
-            binding.modeSwitch.isChecked = true
-            binding.cameraxViewFinder.scaleX = getStringPref("horizontal_scale_factor", "1.33")!!.toFloat()
-            imageProcessor.doDesqueeze = true
-        }else{
-            binding.modeSwitch.text = "Standard"
-            binding.modeSwitch.isChecked = false
-            binding.cameraxViewFinder.scaleX = 1.0f
-            imageProcessor.doDesqueeze = false
+        when {
+            config.isAnamorphic -> {
+                binding.modeSwitch.text = "Anamorphic"
+                binding.modeSwitch.isChecked = true
+                binding.cameraxViewFinder.scaleX = config.anamorphicScaleFactor
+                imageProcessor.doDesqueeze = true
+            }
+            else -> {
+                binding.modeSwitch.text = "Standard"
+                binding.modeSwitch.isChecked = false
+                binding.cameraxViewFinder.scaleX = 1f
+                imageProcessor.doDesqueeze = false
+            }
         }
         binding.modeSwitch.setOnCheckedChangeListener { _, checked ->
-            if(checked){
-                binding.modeSwitch.text = "Anamorphic"
-                binding.cameraxViewFinder.scaleX = getStringPref("horizontal_scale_factor", "1.33")!!.toFloat()
-                imageProcessor.doDesqueeze = true
-                putBooleanPref("mode_anamorphic", true)
-            }else{
-                binding.modeSwitch.text = "Standard"
-                binding.cameraxViewFinder.scaleX = 1.0f
-                imageProcessor.doDesqueeze = false
-                putBooleanPref("mode_anamorphic", false)
+            config.setAnamorphic(this, checked)
+            when {
+                checked -> {
+                    binding.modeSwitch.text = "Anamorphic"
+                    binding.cameraxViewFinder.scaleX = config.anamorphicScaleFactor
+                    imageProcessor.doDesqueeze = true
+                }
+                else -> {
+                    binding.modeSwitch.text = "Standard"
+                    binding.cameraxViewFinder.scaleX = 1f
+                    imageProcessor.doDesqueeze = false
+                }
             }
+            updateAspectRatioLabel()
         }
     }
 
     private fun toggleBorderSelect(){
-        if(binding.borderGroup.isVisible){
-            binding.borderGroup.animate().alpha(0f).withEndAction {
-                binding.borderGroup.hide()
-            }.duration = 250
-        }else{
-            binding.borderGroup.show()
-            binding.borderGroup.alpha = 0f
-            binding.borderGroup.animate().alpha(1f).duration = 250
+        when {
+            binding.borderGroup.isVisible -> {
+                binding.borderGroup.animate().alpha(0f).withEndAction {
+                    binding.borderGroup.hide()
+                }.duration = 250
+            }
+            else -> {
+                binding.borderGroup.show()
+                binding.borderGroup.alpha = 0f
+                binding.borderGroup.animate().alpha(1f).duration = 250
+            }
         }
     }
 
@@ -418,21 +432,13 @@ class MainActivity : AppCompatActivity() {
                 }.build()
             )
         } catch (e: CameraInfoUnavailableException) {
-            println("Stracka cannot access camera: $e")
+            println("Lento cannot access camera: $e")
         }
     }
 
-    var gravityValues: FloatArray? = null
-    var magneticValues: FloatArray? = null
-
-    var levelListener: SensorEventListener? = null
-
     private fun startLevel(){
 
-        skiss = LevelSkiss(
-            binding.levelSkiss
-        )
-
+        skiss = LevelSkiss(binding.levelSkiss)
         skiss?.start()
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
@@ -471,8 +477,36 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun stopLevel(){
+    private fun stopLevel(){
         sensorManager?.unregisterListener(levelListener)
+    }
+
+    private fun updateZoomLevelUI(){
+        if(config.zoomLevel == 1){
+            binding.zoomInner.setImageResource(R.drawable.vector_zoom_in)
+            binding.zoomLabel.text = "1x"
+        }else{
+            binding.zoomInner.setImageResource(R.drawable.vector_zoom_out)
+            binding.zoomLabel.text = "2x"
+        }
+    }
+    private fun updateAspectRatioLabel(){
+        when {
+            config.isAnamorphic -> {
+                when (config.aspectRatioFlag) {
+                    RATIO_4_3 -> binding.aspectRatioLabel.text = "16:9"
+                    RATIO_16_9 -> binding.aspectRatioLabel.text = "2.4:1"
+                    else -> binding.aspectRatioLabel.text = "Unknown ratio"
+                }
+            }
+            else -> {
+                when (config.aspectRatioFlag) {
+                    RATIO_4_3 -> binding.aspectRatioLabel.text = "4:3"
+                    RATIO_16_9 -> binding.aspectRatioLabel.text = "16:9"
+                    else -> binding.aspectRatioLabel.text = "Unknown ratio"
+                }
+            }
+        }
     }
 
     override fun onPause() {

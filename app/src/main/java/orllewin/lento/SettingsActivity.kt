@@ -43,16 +43,20 @@ class SettingsActivity : AppCompatActivity() {
             scaleAmountPreference?.setOnPreferenceChangeListener { preference, newValue ->
                 var isValid = true
 
+                var scaleFactor = 0f
                 try {
-                    val scaleFactor: Float = "$newValue".toFloat()
+                    scaleFactor = "$newValue".toFloat()
                 } catch (e: NumberFormatException) {
                     isValid = false
                     Toast.makeText(this@SettingsFragment.requireContext(), "$newValue is not a valid float value", Toast.LENGTH_SHORT).show()
+                }
+
+                if(isValid) {
+                    CameraConfig.get(requireContext()).setAnamorphicScaleFactor(requireContext(), scaleFactor)
                 }
 
                 isValid
             }
         }
     }
-
 }
