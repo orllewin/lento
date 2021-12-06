@@ -9,14 +9,18 @@ class CameraConfig(
     var isAnamorphic: Boolean = true,
     var anamorphicScaleFactor: Float = 1.33f,
     var aspectRatioFlag: Int = AspectRatio.RATIO_16_9,
-    var zoomLevel: Int = 1
+    var zoomLevel: Int = 1,
+    var lutResource: Int = -1,
+    var lutLabel: String = ""
 ){
     private constructor(builder: Builder) : this(
         isFirstRun = builder.isFirstRun ?: true,
         isAnamorphic = builder.isAnamorphic ?: true,
         anamorphicScaleFactor = builder.anamorphicScaleFactor ?: 1.33f,
         aspectRatioFlag = builder.aspectRatioFlag ?: AspectRatio.RATIO_16_9,
-        zoomLevel = builder.zoomLevel ?: 1
+        zoomLevel = builder.zoomLevel ?: 1,
+        lutResource = builder.lutResource ?: -1,
+        lutLabel = builder.lutLabel ?: ""
     )
 
     companion object {
@@ -30,6 +34,8 @@ class CameraConfig(
             editor.putFloat("anamorphicScaleFactor", config.anamorphicScaleFactor)
             editor.putInt("aspectRatioFlag", config.aspectRatioFlag)
             editor.putInt("zoomLevel", config.zoomLevel)
+            editor.putInt("lutResource", config.lutResource)
+            editor.putString("lutLabel", config.lutLabel)
             editor.apply()
         }
 
@@ -41,6 +47,8 @@ class CameraConfig(
             builder.anamorphicScaleFactor = prefs.getFloat("anamorphicScaleFactor", 1.33f)
             builder.aspectRatioFlag = prefs.getInt("aspectRatioFlag", AspectRatio.RATIO_16_9)
             builder.zoomLevel = prefs.getInt("zoomLevel", 1)
+            builder.lutResource = prefs.getInt("lutResource", -1)
+            builder.lutLabel = prefs.getString("lutLabel", "") ?: ""
             return builder.build()
         }
     }
@@ -51,6 +59,8 @@ class CameraConfig(
         var anamorphicScaleFactor: Float? = 1.33f
         var aspectRatioFlag: Int? = AspectRatio.RATIO_16_9
         var zoomLevel: Int? = 1
+        var lutResource: Int? = -1
+        var lutLabel: String = ""
         fun build() = CameraConfig(this)
     }
 
@@ -76,6 +86,12 @@ class CameraConfig(
 
     fun setZoomLevel(context: Context, zoomLevel: Int){
         this.zoomLevel = zoomLevel
+        put(context, this)
+    }
+
+    fun setLut(context: Context, lutResource: Int?, lutLabel: String){
+        this.lutResource = lutResource ?: -1
+        this.lutLabel = lutLabel
         put(context, this)
     }
 

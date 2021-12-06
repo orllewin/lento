@@ -22,7 +22,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.preference.PreferenceManager
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -179,11 +178,11 @@ class MainActivity : AppCompatActivity() {
         binding.borderLayout.setOnClickListener { toggleBorderSelect() }
         setupBorderChips()
 
+        updateLutModel()
         binding.filmLayout.setOnClickListener {
             FilmSelectionDialog(this){ resId, label ->
-                imageProcessor.filmResource = resId
-                imageProcessor.filmLabel = label
-                binding.selectedFilmLabel.text = label
+                config.setLut(this, resId, label ?: "")
+                updateLutModel()
             }.show()
         }
 
@@ -507,6 +506,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun updateLutModel(){
+        imageProcessor.filmResource = config.lutResource
+        imageProcessor.filmLabel = config.lutLabel
+        binding.selectedFilmLabel.text = config.lutLabel
     }
 
     override fun onPause() {

@@ -73,7 +73,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
     //Check if there's a LUT to apply
     private fun processCapture(file: File){
         when {
-            filmResource != null -> {
+            filmResource != null && filmResource != -1 -> {
                 val ffmpeg = FFMpegHaldCLUT(context)
                 ffmpeg.process(filmResource!!, file){ filteredFile, error ->
                     if(error != null){
