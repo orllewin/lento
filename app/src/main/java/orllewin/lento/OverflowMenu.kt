@@ -11,6 +11,8 @@ class OverflowMenu(
     private val context: Context,
     view: View,
     timerActive: Boolean,
+    levelActive: Boolean,
+    gridActive: Boolean,
     onToggleLevel: () -> Unit,
     onTimerToggle: () -> Unit,
     onToggleGrid: () -> Unit) {
@@ -37,13 +39,22 @@ class OverflowMenu(
             true
         }
 
-        val levelItem = popup.menu.add("Toggle level")
+        val levelItem = if(levelActive){
+            popup.menu.add("Turn level off")
+        }else{
+            popup.menu.add("Turn level on")
+        }
+
         levelItem.setOnMenuItemClickListener {
             onToggleLevel()
             true
         }
 
-        val gridItem = popup.menu.add("Toggle grid")
+        val gridItem = if(gridActive){
+            popup.menu.add("Turn grid off")
+        }else{
+            popup.menu.add("Turn grid on")
+        }
         gridItem.setOnMenuItemClickListener {
             onToggleGrid()
             true

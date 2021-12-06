@@ -35,6 +35,8 @@ class LevelSkiss (view: SkissView): Skiss(view) {
     override fun update(canvas: Canvas) {
 
         if(drawLevel) {
+            strokeWeight(5)
+
             when {
                 levelTarget.distance(levelLeftEdge) < 10 -> stroke(levelGoodColour)
                 else -> stroke(levelBadColour)
@@ -65,8 +67,6 @@ class LevelSkiss (view: SkissView): Skiss(view) {
             line(0, (height/3) * 2, width, (height/3) * 2)
             line(width/3, 0, width/3, height)
             line((width/3) * 2, 0, (width/3) * 2, height)
-
-            strokeWeight(5)
         }
     }
 

@@ -115,34 +115,42 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.putImageProcessor(imageProcessor)
 
-        binding.overflowContainer.setOnClickListener { OverflowMenu(this, binding.overflow, viewModel.isTimerActive, {
-            //onTogglelevel
-            skiss?.let{
-                when {
-                    skiss!!.drawLevel -> {
-                        skiss?.drawLevel = false
-                        stopLevel()
+        binding.overflowContainer.setOnClickListener {
+            OverflowMenu(
+                context = this,
+                view = binding.overflow,
+                timerActive = viewModel.isTimerActive,
+                levelActive = skiss?.drawLevel ?: false,
+                gridActive = skiss?.drawGrid ?: false,
+                {
+                    //onTogglelevel
+                    skiss?.let {
+                        when {
+                            skiss!!.drawLevel -> {
+                                skiss?.drawLevel = false
+                                stopLevel()
+                            }
+                            else -> {
+                                skiss?.drawLevel = true
+                                startLevel()
+                            }
+                        }
                     }
-                    else -> {
-                        skiss?.drawLevel = true
-                        startLevel()
+                }, {
+                    //onToggleTimer
+                    viewModel.timerActive(!viewModel.isTimerActive)
+                    when {
+                        viewModel.isTimerActive -> binding.timerIcon.show()
+                        else -> binding.timerIcon.hide()
                     }
-                }
-            }
-        }, {
-            //onToggleTimer
-            viewModel.timerActive(!viewModel.isTimerActive)
-            when {
-                viewModel.isTimerActive -> binding.timerIcon.show()
-                else -> binding.timerIcon.hide()
-            }
-        }, {
-            //onToggleGrid
-            skiss?.let{
-                skiss!!.drawGrid = !skiss!!.drawGrid
-            }
+                }, {
+                    //onToggleGrid
+                    skiss?.let {
+                        skiss!!.drawGrid = !skiss!!.drawGrid
+                    }
 
-        }).show() }
+                }).show()
+        }
 
         setupCameraMode()
 
