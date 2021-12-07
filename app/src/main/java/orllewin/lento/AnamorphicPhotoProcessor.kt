@@ -26,7 +26,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
     private val executor = ContextCompat.getMainExecutor(context)
     private val contentResolver = context.contentResolver
 
-    val scaleFactor = 1.33f
+    var scaleFactor = 1.33f
     var useNativeToolkit = true
     var doDesqueeze: Boolean = true
     var filmResource: Int? = null
@@ -178,6 +178,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
                     BorderWhite -> Color.WHITE
                     else -> Color.BLACK
                 }
+
                 canvas.drawColor(color)
                 canvas.drawBitmap(image, 0f, (frameHeight - bitmapHeight)/2f, Paint())
                 this.contentResolver.openOutputStream(uri)?.use { outputStream ->

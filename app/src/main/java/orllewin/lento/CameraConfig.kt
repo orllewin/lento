@@ -14,7 +14,8 @@ class CameraConfig(
     var lutResource: Int = -1,
     var lutLabel: String = "",
     var flashMode: Int = ImageCapture.FLASH_MODE_OFF,
-    var borderMode: Int = AnamorphicPhotoProcessor.BorderNone
+    var borderMode: Int = AnamorphicPhotoProcessor.BorderNone,
+    var hideAnamnorphicFeatures: Boolean = false
 ){
     private constructor(builder: Builder) : this(
         isFirstRun = builder.isFirstRun ?: true,
@@ -25,7 +26,8 @@ class CameraConfig(
         lutResource = builder.lutResource ?: -1,
         lutLabel = builder.lutLabel,
         flashMode = builder.flashMode,
-        borderMode = builder.borderMode
+        borderMode = builder.borderMode,
+        hideAnamnorphicFeatures = builder.hideAnamnorphicFeatures ?: false
 
     )
 
@@ -44,6 +46,7 @@ class CameraConfig(
             editor.putString("lutLabel", config.lutLabel)
             editor.putInt("flashMode", config.flashMode)
             editor.putInt("borderMode", config.borderMode)
+            editor.putBoolean("hideAnamnorphicFeatures", config.hideAnamnorphicFeatures)
             editor.apply()
         }
 
@@ -59,6 +62,7 @@ class CameraConfig(
             builder.lutLabel = prefs.getString("lutLabel", "") ?: ""
             builder.flashMode = prefs.getInt("flashMode", ImageCapture.FLASH_MODE_OFF)
             builder.borderMode = prefs.getInt("borderMode", AnamorphicPhotoProcessor.BorderNone)
+            builder.hideAnamnorphicFeatures = prefs.getBoolean("hideAnamnorphicFeatures", false)
             return builder.build()
         }
     }
@@ -73,6 +77,7 @@ class CameraConfig(
         var lutLabel: String = ""
         var flashMode: Int = ImageCapture.FLASH_MODE_OFF
         var borderMode: Int = AnamorphicPhotoProcessor.BorderNone
+        var hideAnamnorphicFeatures: Boolean? = null
         fun build() = CameraConfig(this)
     }
 
@@ -114,6 +119,11 @@ class CameraConfig(
 
     fun setBorderMode(context: Context, borderMode: Int){
         this.borderMode = borderMode
+        put(context, this)
+    }
+
+    fun setHideAnamnorphicFeatures(context: Context, hideAnamnorphicFeatures: Boolean){
+        this.hideAnamnorphicFeatures = hideAnamnorphicFeatures
         put(context, this)
     }
 

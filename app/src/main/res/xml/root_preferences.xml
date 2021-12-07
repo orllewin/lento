@@ -1,10 +1,19 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <SwitchPreferenceCompat
+        app:key="hide_anamorphic_switch"
+        app:title="@string/hide_anamorphic_switch_title"
+        app:summaryOn="@string/hide_anamorphic_switch_on"
+        app:summaryOff="@string/hide_anamorphic_switch_off"
+        app:disableDependentsState="true"
+        app:defaultValue="false"/>
+
     <EditTextPreference
         app:key="horizontal_scale_factor"
         app:title="@string/horizontal_scale_factor"
         app:defaultValue="1.33"
+        app:dependency="hide_anamorphic_switch"
         app:useSimpleSummaryProvider="true" />
 
     <SwitchPreferenceCompat
@@ -12,6 +21,7 @@
         app:title="@string/use_native_toolkit"
         app:summaryOn="@string/use_native_toolkit_summary"
         app:summaryOff="@string/use_android_method_summary"
+        app:dependency="hide_anamorphic_switch"
         app:defaultValue="true"/>
 
 </PreferenceScreen>

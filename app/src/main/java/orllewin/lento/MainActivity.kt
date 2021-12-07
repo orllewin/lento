@@ -2,6 +2,7 @@ package orllewin.lento
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -22,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.preference.PreferenceManager
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -273,7 +275,7 @@ class MainActivity : AppCompatActivity() {
                 camera?.cameraControl?.setZoomRatio(config.zoomLevel.toFloat())
                 autoFocus(null)
             } catch(exc: Exception) {
-                toast("Tirwedd camera bind exception: $exc")
+                toast("Lento camera bind exception: $exc")
             }
 
         }, ContextCompat.getMainExecutor(this))
@@ -281,6 +283,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
         binding.root.postDelayed({
             WindowCompat.setDecorFitsSystemWindows(window, false)
             WindowInsetsControllerCompat(window, binding.root).let { controller ->
@@ -302,6 +305,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         if(binding.levelSkiss.isVisible) startLevel()
+
+        //Check if user has changed the 'hide anamorphic' settings
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val anamorphicScaleFactor = prefs.getString("horizontal_scale_factor", "1.33")!!.toFloat()
+        config.anamorphicScaleFactor = anamorphicScaleFactor
+        imageProcessor.scaleFactor = anamorphicScaleFactor
+        imageProcessor.useNativeToolkit = prefs.getBoolean("use_native_toolkit", true)
+
+        val hideAnamorphicFeatures = prefs.getBoolean("hide_anamorphic_switch", false)
+        config.setHideAnamnorphicFeatures(this, hideAnamorphicFeatures)
+        when {
+            hideAnamorphicFeatures -> {
+                binding.modeSwitch.hide()
+                binding.borderContainer.hide()
+                setupStandardMode()
+            }
+            else -> {
+                binding.modeSwitch.show()
+                binding.borderContainer.show()
+            }
+        }
+
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -322,12 +348,7 @@ class MainActivity : AppCompatActivity() {
                 binding.cameraxViewFinder.scaleX = config.anamorphicScaleFactor
                 imageProcessor.doDesqueeze = true
             }
-            else -> {
-                binding.modeSwitch.text = "Standard"
-                binding.modeSwitch.isChecked = false
-                binding.cameraxViewFinder.scaleX = 1f
-                imageProcessor.doDesqueeze = false
-            }
+            else -> setupStandardMode()
         }
         binding.modeSwitch.setOnCheckedChangeListener { _, checked ->
             config.setAnamorphic(this, checked)
@@ -345,6 +366,13 @@ class MainActivity : AppCompatActivity() {
             }
             updateAspectRatioLabel()
         }
+    }
+
+    private fun setupStandardMode() {
+        binding.modeSwitch.text = "Standard"
+        binding.modeSwitch.isChecked = false
+        binding.cameraxViewFinder.scaleX = 1f
+        imageProcessor.doDesqueeze = false
     }
 
     private fun toggleBorderSelect(){
