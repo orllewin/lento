@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="viewmodel" type="orllewin.lento.MainViewModel" />
+
+        <variable
+            name="viewmodel"
+            type="orllewin.lento.MainViewModel" />
     </data>
 
     <RelativeLayout
@@ -56,10 +59,10 @@
                     android:id="@+id/preview_progress"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:layout_centerInParent="true"
                     android:indeterminate="true"
-                    android:visibility="gone"
                     android:indeterminateTint="@color/white"
-                    android:layout_centerInParent="true"/>
+                    android:visibility="gone" />
 
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
@@ -107,8 +110,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_centerInParent="true"
-                android:visibility="gone"
-                android:src="@drawable/vector_timer" />
+                android:src="@drawable/vector_timer"
+                android:visibility="gone" />
 
         </RelativeLayout>
 
@@ -131,247 +134,245 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/border_container"
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/button_container_height"
-            android:layout_above="@+id/film_container"
-            android:layout_marginStart="@dimen/control_left_padding"
-            android:layout_marginBottom="4dp">
-
-            <RelativeLayout
-                android:id="@+id/border_layout"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:backgroundTint="@color/white"
-                android:clickable="true"
-                android:focusable="true">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/border_inner"
-                    android:layout_width="24dp"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/vector_border_none" />
-
-            </RelativeLayout>
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/border_group"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/border_layout"
-                android:visibility="gone"
-                app:checkedChip="@+id/chip_flash_off"
-                app:selectionRequired="true"
-                app:singleLine="true"
-                app:singleSelection="true">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/border_none"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:text="None" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/border_white"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:text="White" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/border_black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:text="Black" />
-            </com.google.android.material.chip.ChipGroup>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/film_container"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/button_container_height"
-            android:layout_above="@+id/flash_container"
-            android:layout_marginStart="@dimen/control_left_padding"
-            android:layout_marginBottom="4dp">
-
-            <RelativeLayout
-                android:id="@+id/film_layout"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:backgroundTint="@color/white"
-                android:clickable="true"
-                android:focusable="true">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/film_inner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:paddingEnd="12dp"
-                    android:src="@drawable/ic_vector_film_icon"
-                    android:tint="@color/white" />
-
-            </RelativeLayout>
-
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/selected_film_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="12dp"
-                android:layout_toRightOf="@+id/film_layout"
-                tools:text="Kodak Kodacolour 64"
-                android:textColor="@color/white"/>
-
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/flash_container"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/button_container_height"
-            android:layout_above="@+id/zoom_container"
-            android:layout_marginStart="@dimen/control_left_padding"
-            android:layout_marginBottom="4dp">
-
-            <RelativeLayout
-                android:id="@+id/flash_layout"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:backgroundTint="@color/white"
-                android:clickable="true"
-                android:focusable="true">
-
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/flash_inner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/vector_flash_off"
-                    android:tint="@color/white" />
-
-            </RelativeLayout>
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/flash_group"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/flash_layout"
-                android:visibility="gone"
-                app:checkedChip="@+id/chip_flash_off"
-                app:selectionRequired="true"
-                app:singleLine="true"
-                app:singleSelection="true">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_flash_off"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:text="Flash off" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_flash_on"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:text="Flash on" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_flash_auto"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:text="Flash Auto" />
-            </com.google.android.material.chip.ChipGroup>
-
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/zoom_container"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/button_container_height"
-            android:layout_above="@+id/aspect_ratio_container"
-            android:layout_marginStart="@dimen/control_left_padding"
-            android:layout_marginBottom="4dp">
-
-            <RelativeLayout
-                android:id="@+id/zoom_layout"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:clickable="true"
-                android:focusable="true">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/zoom_inner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/vector_zoom_in"
-                    android:tint="@color/white" />
-
-            </RelativeLayout>
-
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/zoom_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/zoom_layout"
-                android:paddingStart="8dp"
-                android:text="1x"
-                android:textColor="@color/white" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/aspect_ratio_container"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/button_container_height"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="@dimen/control_left_padding"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/layout_background"
+            android:orientation="vertical"
+            android:padding="12dp">
 
             <RelativeLayout
-                android:id="@+id/aspect_ratio_layout"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_centerVertical="true"
-                android:clickable="true"
-                android:focusable="true">
+                android:id="@+id/border_container"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_container_height"
+                android:layout_above="@+id/film_container">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/aspect_ratio_inner"
+                <RelativeLayout
+                    android:id="@+id/border_layout"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:backgroundTint="@color/white"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/border_inner"
+                        android:layout_width="24dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/vector_border_none" />
+
+                </RelativeLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/border_group"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/vector_aspect_ratio"
-                    android:tint="@color/white" />
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/border_layout"
+                    android:visibility="gone"
+                    app:checkedChip="@+id/chip_flash_off"
+                    app:selectionRequired="true"
+                    app:singleLine="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/border_none"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:text="None" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/border_white"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:text="White" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/border_black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:text="Black" />
+                </com.google.android.material.chip.ChipGroup>
 
             </RelativeLayout>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/aspect_ratio_label"
+            <RelativeLayout
+                android:id="@+id/film_container"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/aspect_ratio_layout"
-                android:paddingStart="8dp"
-                android:text="16:9"
-                android:textColor="@color/white" />
-        </RelativeLayout>
+                android:layout_height="@dimen/button_container_height">
+
+                <RelativeLayout
+                    android:id="@+id/film_layout"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerVertical="true"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:backgroundTint="@color/white"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/film_inner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_centerVertical="true"
+                        android:paddingEnd="12dp"
+                        android:src="@drawable/ic_vector_film_icon"
+                        android:tint="@color/white" />
+
+                </RelativeLayout>
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/selected_film_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/film_layout"
+                    android:textColor="@color/white"
+                    tools:text="Kodak Kodacolour 64" />
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/flash_container"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_container_height">
+
+                <RelativeLayout
+                    android:id="@+id/flash_layout"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:backgroundTint="@color/white"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/flash_inner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/vector_flash_off"
+                        android:tint="@color/white" />
+
+                </RelativeLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/flash_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/flash_layout"
+                    android:visibility="gone"
+                    app:checkedChip="@+id/chip_flash_off"
+                    app:selectionRequired="true"
+                    app:singleLine="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_flash_off"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:text="Flash off" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_flash_on"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:text="Flash on" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_flash_auto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:text="Flash Auto" />
+                </com.google.android.material.chip.ChipGroup>
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/zoom_container"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_container_height">
+
+                <RelativeLayout
+                    android:id="@+id/zoom_layout"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/zoom_inner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/vector_zoom_in"
+                        android:tint="@color/white" />
+
+                </RelativeLayout>
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/zoom_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/zoom_layout"
+                    android:paddingStart="8dp"
+                    android:text="1x"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/aspect_ratio_container"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_container_height">
+
+                <RelativeLayout
+                    android:id="@+id/aspect_ratio_layout"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerVertical="true"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/aspect_ratio_inner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/vector_aspect_ratio"
+                        android:tint="@color/white" />
+
+                </RelativeLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/aspect_ratio_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/aspect_ratio_layout"
+                    android:paddingStart="8dp"
+                    android:text="16:9"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <!-- Level -->
         <orllewin.skiss.SkissView
@@ -387,11 +388,11 @@
             android:id="@+id/hud_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:textSize="22sp"
-            android:textColor="@color/white"
             android:layout_centerInParent="true"
-            android:paddingBottom="64dp"/>
+            android:paddingTop="16dp"
+            android:paddingBottom="64dp"
+            android:textColor="@color/white"
+            android:textSize="22sp" />
 
 
     </RelativeLayout>
