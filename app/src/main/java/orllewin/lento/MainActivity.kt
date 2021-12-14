@@ -31,6 +31,7 @@ import orllewin.extensions.*
 import orllewin.file_io.CameraIO
 import orllewin.file_io.OppenFileIO
 import orllewin.lento.databinding.ActivityMainBinding
+import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -314,7 +315,7 @@ class MainActivity : AppCompatActivity() {
         imageProcessor.scaleFactor = anamorphicScaleFactor
         imageProcessor.useNativeToolkit = prefs.getBoolean("use_native_toolkit", true)
 
-        val hideAnamorphicFeatures = prefs.getBoolean("hide_anamorphic_switch", false)
+        val hideAnamorphicFeatures = prefs.getBoolean("hide_anamorphic_switch", true)
         config.setHideAnamnorphicFeatures(this, hideAnamorphicFeatures)
         when {
             hideAnamorphicFeatures -> {
@@ -582,5 +583,23 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
 
         if(binding.levelSkiss.isVisible) stopLevel()
+
+
+        cacheDir.listFiles()?.forEach { file ->
+            println("Lento cache file: ${file.path}")
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        cacheDir.listFiles()?.forEach { cacheFile ->
+            when {
+                cacheFile.name.contains("filtered_temp") -> {
+                    val cacheFileDeleted = cacheFile.delete()
+                    println("Lento cache cleared: $cacheFileDeleted")
+                }
+            }
+        }
     }
 }

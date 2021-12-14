@@ -7,7 +7,7 @@
         app:summaryOn="@string/hide_anamorphic_switch_on"
         app:summaryOff="@string/hide_anamorphic_switch_off"
         app:disableDependentsState="true"
-        app:defaultValue="false"/>
+        app:defaultValue="true"/>
 
     <EditTextPreference
         app:key="horizontal_scale_factor"

@@ -75,7 +75,7 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         when {
             filmResource != null && filmResource != -1 -> {
                 val ffmpeg = FFMpegHaldCLUT(context)
-                ffmpeg.process(filmResource!!, file){ filteredFile, error ->
+                ffmpeg.process(filmResource!!, "$filmLabel", file){ filteredFile, error ->
                     if(error != null){
                         //todo - handle
                         println("error: $error")
