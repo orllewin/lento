@@ -2,10 +2,10 @@
 <resources>
     <string-array name="lento_film_labels">
         <item>Lento Mono Alpha</item>
-        <item>Lento Mono Alpha 2\nHigh Key</item>
-        <item>Lento Mono Portrait\nHigh Contrast</item>
+        <item>Lento Mono Alpha High Key</item>
+        <item>Lento Mono Portrait High Contrast</item>
         <item>Lento Colour Alpha</item>
-        <item>Lento Colour Alpha 2\High Key</item>
+        <item>Lento Colour Alpha High Key</item>
     </string-array>
 
     <string-array name="lento_film_raw_resources">
@@ -14,111 +14,5 @@
         <item>lento_mono_portrait_1</item>
         <item>lento_colour_alpha</item>
         <item>lento_colour_alpha_high_key</item>
-    </string-array>
-
-    <string-array name="film_labels_bw">
-        <item>Rollei Ortho_25</item>
-        <item>Rollei Retro 80s</item>
-        <item>Rollei Retro 100 Tonal</item>
-        <item>AGFA APX 25 ***</item>
-        <item>Fuji FP-3000b</item>
-        <item>Fuji Neopan 1600</item>
-        <item>Ilford Delta 100</item>
-        <item>Ilford Delta 400</item>
-        <item>Ilford Delta 3200</item>
-        <item>Ilford HP 5</item>
-        <item>Ilford Pan F Plus 50</item>
-        <item>Ilford XP2</item>
-        <item>Kodak TMAX 3200</item>
-        <item>Kodak TRI-X 400</item>
-        <item>Polaroid 664</item>
-        <item>Polaroid 665</item>
-        <item>Polaroid 667</item>
-        <item>Polaroid 672</item>
-    </string-array>
-
-    <string-array name="film_raw_resources_bw">
-        <item>mono_rollei_ortho_25</item>
-        <item>mono_rollei_retro_80s</item>
-        <item>mono_rollei_retro_100_tonal</item>
-        <item>mono_agfa_apx_25</item>
-        <item>mono_fuji_fp_3000b</item>
-        <item>mono_fuji_neopan_1600</item>
-        <item>mono_ilford_delta_100</item>
-        <item>mono_ilford_delta_400</item>
-        <item>mono_ilford_delta_3200</item>
-        <item>mono_ilford_hp5</item>
-        <item>mono_ilford_pan_f_plus_50</item>
-        <item>mono_ilford_xp2</item>
-        <item>mono_kodak_tmax_3200</item>
-        <item>mono_kodak_tri_x_400</item>
-        <item>mono_polaroid_664</item>
-        <item>mono_polaroid_665</item>
-        <item>mono_polaroid_667</item>
-        <item>mono_polaroid_672</item>
-    </string-array>
-
-    <string-array name="film_labels_colour">
-        <item>None</item>
-        <item>Agfa Precisa 100</item>
-        <item>Agfa Ultra Color 100</item>
-        <item>Agfa Vista 200</item>
-        <item>Fuji 160C</item>
-        <item>Fuji 400H</item>
-        <item>Fuji FP-100c</item>
-        <item>Kodak Kodachrome 25</item>
-        <item>Kodak Kodachrome 64</item>
-        <item>Kodak Portra 400</item>
-        <item>Kodak Portra 800</item>
-        <item>Kodak Portra 800 HC</item>
-        <item>Lomography Redscale 100</item>
-        <item>Polaroid 669</item>
-        <item>Polaroid 690</item>
-        <item>Polaroid 690 Warm</item>
-        <item>Polaroid PX-680</item>
-        <item>Polaroid PX-70</item>
-    </string-array>
-
-    <string-array name="film_raw_resources_colour">
-        <item>none</item>
-        <item>colour_agfa_precisa_100</item>
-        <item>colour_agfa_ultra_color_100</item>
-        <item>colour_agfa_vista_200</item>
-        <item>colour_fuji_160c</item>
-        <item>colour_fuji_400h</item>
-        <item>colour_fuji_fp_100c</item>
-        <item>colour_kodak_kodachrome_25</item>
-        <item>colour_kodak_kodachrome_64_generic</item>
-        <item>colour_kodak_portra_400</item>
-        <item>colour_kodak_portra_800</item>
-        <item>colour_kodak_portra_800_hc</item>
-        <item>colour_lomography_redscale_100</item>
-        <item>colour_polaroid_669</item>
-        <item>colour_polaroid_690</item>
-        <item>colour_polaroid_690_warm</item>
-        <item>colour_polaroid_px_680</item>
-        <item>colour_polaroid_px_70</item>
-    </string-array>
-
-    <string-array name="film_labels_misc">
-        <item>Anime</item>
-        <item>Bleach Bypass</item>
-        <item>Candle Light</item>
-        <item>Fall Colours</item>
-        <item>Futuristic Bleak</item>
-        <item>Late Sunset</item>
-        <item>Teal Orange</item>
-        <item>Tension Green 2</item>
-    </string-array>
-
-    <string-array name="film_raw_resources_misc">
-        <item>misc_anime</item>
-        <item>misc_bleach_bypass</item>
-        <item>misc_candle_light</item>
-        <item>misc_fall_colors</item>
-        <item>misc_futuristic_bleak</item>
-        <item>misc_late_sunset</item>
-        <item>misc_teal_orange</item>
-        <item>misc_tension_green</item>
     </string-array>
 </resources>

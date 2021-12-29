@@ -22,9 +22,17 @@ class FilmSelectionDialog(val context: Context, val onFilmSelect: (resId: Int?, 
         val view: View = LayoutInflater.from(context).inflate(R.layout.dialog_film_selection, null, false)
         val binding = DialogFilmSelectionBinding.bind(view)
 
-        //Lento
         val lentoLabels = context.resources.getStringArray(R.array.lento_film_labels)
         val lentoResources = context.resources.getStringArray(R.array.lento_film_raw_resources)
+
+        //None chip to cancel LUT selection
+        val noneChip = Chip(context)
+        noneChip.text = "None"
+        noneChip.tag = "none"
+        noneChip.isCheckable = true
+        noneChip.id = ViewCompat.generateViewId()
+        noneChip.setOnClickListener(this)
+        binding.flexBoxLento.addView(noneChip)
 
         lentoLabels.forEachIndexed { index, label ->
             val chip = Chip(context)
@@ -44,83 +52,6 @@ class FilmSelectionDialog(val context: Context, val onFilmSelect: (resId: Int?, 
             lp.setMargins(0, 0, 8.toPixels(), 0)
             chip.layoutParams = lp
         }
-
-        //End of Lento
-
-        //Colour
-        val fileLabelsColour = context.resources.getStringArray(R.array.film_labels_colour)
-        val fileResourcesColour = context.resources.getStringArray(R.array.film_raw_resources_colour)
-
-        fileLabelsColour.forEachIndexed { index, label ->
-            val chip = Chip(context)
-
-            chip.text = label
-
-            val rawId = fileResourcesColour[index]
-            chip.tag = rawId
-            chip.isCheckable = true
-            chip.id = ViewCompat.generateViewId()
-            chip.setOnClickListener(this)
-            binding.flexBoxColour.addView(chip)
-        }
-
-        binding.flexBoxColour.children.iterator().forEach { chip ->
-            val lp = chip.layoutParams as FlexboxLayout.LayoutParams
-            lp.setMargins(0, 0, 8.toPixels(), 0)
-            chip.layoutParams = lp
-        }
-
-        //End of colour
-
-        //Monochrome
-        val fileLabelsBW = context.resources.getStringArray(R.array.film_labels_bw)
-        val fileResourcesBW = context.resources.getStringArray(R.array.film_raw_resources_bw)
-
-        fileLabelsBW.forEachIndexed { index, label ->
-            val chip = Chip(context)
-
-            chip.text = label
-
-            val rawId = fileResourcesBW[index]
-            chip.tag = rawId
-            chip.isCheckable = true
-            chip.id = ViewCompat.generateViewId()
-            chip.setOnClickListener(this)
-            binding.flexBoxBw.addView(chip)
-        }
-
-        binding.flexBoxBw.children.iterator().forEach { chip ->
-            val lp = chip.layoutParams as FlexboxLayout.LayoutParams
-            lp.setMargins(0, 0, 8.toPixels(), 0)
-            chip.layoutParams = lp
-        }
-
-        //End of monochrome
-
-        //Start of misc
-        val fileLabelsMisc = context.resources.getStringArray(R.array.film_labels_misc)
-        val fileResourcesMisc = context.resources.getStringArray(R.array.film_raw_resources_misc)
-
-        fileLabelsMisc.forEachIndexed { index, label ->
-            val chip = Chip(context)
-
-            chip.text = label
-
-            val rawId = fileResourcesMisc[index]
-            chip.tag = rawId
-            chip.isCheckable = true
-            chip.id = ViewCompat.generateViewId()
-            chip.setOnClickListener(this)
-            binding.flexBoxMisc.addView(chip)
-        }
-
-        binding.flexBoxMisc.children.iterator().forEach { chip ->
-            val lp = chip.layoutParams as FlexboxLayout.LayoutParams
-            lp.setMargins(0, 0, 8.toPixels(), 0)
-            chip.layoutParams = lp
-        }
-
-        //End of misc
 
         builder.setView(view)
         dialog = builder.create()

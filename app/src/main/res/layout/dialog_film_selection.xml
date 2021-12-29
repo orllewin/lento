@@ -19,88 +19,8 @@
             android:paddingStart="16dp"
             android:text="Film Simulation" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:paddingTop="16dp"
-            android:paddingStart="16dp"
-            android:text="Lento" />
-
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/flex_box_lento"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:flexWrap="wrap"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="16dp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:background="#dedede" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:paddingTop="16dp"
-            android:paddingStart="16dp"
-            android:text="Colour" />
-
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/flex_box_colour"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:flexWrap="wrap"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="16dp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:background="#dedede" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:paddingTop="16dp"
-            android:paddingStart="16dp"
-            android:text="Monochrome" />
-
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/flex_box_bw"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:flexWrap="wrap"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="16dp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:background="#dedede" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:paddingTop="16dp"
-            android:paddingStart="16dp"
-            android:text="Misc" />
-
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/flex_box_misc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:flexWrap="wrap"

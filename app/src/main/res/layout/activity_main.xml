@@ -237,6 +237,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
+                    android:textSize="11sp"
                     android:layout_toEndOf="@+id/film_layout"
                     android:textColor="@color/white"
                     tools:text="Kodak Kodacolour 64" />
