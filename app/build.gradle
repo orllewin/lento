@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.gms.google-services'
     id 'kotlin-android'
     id 'kotlin-kapt'
 }
@@ -53,9 +54,13 @@ dependencies {
     implementation project(path: ':modules:skiss')
     implementation project(path: ':modules:renderscript_toolkit')
 
-    implementation "androidx.camera:camera-core:1.1.0-alpha11"
-    implementation "androidx.camera:camera-camera2:1.1.0-alpha11"
-    implementation "androidx.camera:camera-lifecycle:1.1.0-alpha11"
-    implementation 'androidx.camera:camera-extensions:1.0.0-alpha31'
-    implementation 'androidx.camera:camera-view:1.0.0-alpha31'
+    implementation "androidx.camera:camera-core:1.1.0-alpha12"
+    implementation "androidx.camera:camera-camera2:1.1.0-alpha12"
+    implementation "androidx.camera:camera-lifecycle:1.1.0-alpha12"
+    implementation 'androidx.camera:camera-extensions:1.0.0-alpha32'
+    implementation 'androidx.camera:camera-view:1.0.0-alpha32'
+
+    implementation platform('com.google.firebase:firebase-bom:29.0.3')
+    implementation 'com.google.firebase:firebase-analytics'
+
 }

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1010397205671",
+    "project_id": "orllewinwebsite",
+    "storage_bucket": "orllewinwebsite.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1010397205671:android:8f7e6d7bebbdf36345b782",
+        "android_client_info": {
+          "package_name": "orllewin.lento"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1010397205671-10gmh5oflu5s8qr4a47uf322ronmkjuf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFOFTcGOG5--tTgK3sRcAyJVGWhWDBgWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1010397205671-10gmh5oflu5s8qr4a47uf322ronmkjuf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
