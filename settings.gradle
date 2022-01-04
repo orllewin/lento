@@ -6,7 +6,7 @@ dependencyResolutionManagement {
         jcenter() // Warning: this repository is going to shut down soon
     }
 }
-rootProject.name = "Tirwedd"
+rootProject.name = "Lento"
 include ':app'
 include ':modules:extensions'
 include ':modules:file_io'
