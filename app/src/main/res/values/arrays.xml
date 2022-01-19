@@ -1,4 +1,18 @@
 <resources>
+
+    <string-array name="all_luts">
+        <item>:Monochrome</item>
+        <item>orl_mono_premium</item>
+        <item>orl_mono_crisp</item>
+        <item>orl_mono_standard</item>
+        <item>orl_mono_standard_alt</item>
+        <item>orl_mono_portrait</item>
+        <item>:Colour</item>
+        <item>orl_colour_standard</item>
+        <item>orl_colour_80s</item>
+        <item>orl_colour_blue_high</item>
+        <item>orl_colour_bleached</item>
+    </string-array>
     <string-array name="letterbox_colour_entries">
         <item>Black</item>
         <item>White</item>

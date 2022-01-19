@@ -10,21 +10,30 @@ import android.provider.MediaStore
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.RoundedBitmapDrawable
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.renderscript.Toolkit
+import jp.co.cyberagent.android.gpuimage.GPUImage
+import jp.co.cyberagent.android.gpuimage.filter.GPUImageLookupFilter
 import kotlinx.coroutines.flow.MutableStateFlow
 import orllewin.haldclut.FFMpegHaldCLUT
+import orllewin.lento.lut.Lut
+import orllewin.lento.lut.UnrealLutToolkit
 import java.io.File
 import java.time.OffsetDateTime
 
 class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope: LifecycleCoroutineScope) {
 
-    val exportedPreviewStateFlow = MutableStateFlow<Pair<Uri?, Bitmap?>?>(null)
+    val exportedPreviewStateFlow = MutableStateFlow<Pair<Uri?, RoundedBitmapDrawable?>?>(null)
+    val capturePreviewStateFlow = MutableStateFlow<Bitmap?>(null)
     val errorStateFlow = MutableStateFlow<String?>(null)
 
     private val cacheDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
     private val executor = ContextCompat.getMainExecutor(context)
     private val contentResolver = context.contentResolver
+
+    val toolkit = UnrealLutToolkit()
 
     var scaleFactor = 1.33f
     var useNativeToolkit = true
@@ -65,31 +74,20 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    processCapture(cacheFile)
+                    resize(cacheFile)
                 }
             })
     }
 
-    //Check if there's a LUT to apply
-    private fun processCapture(file: File){
-        when {
+    private fun applyLut(source: Bitmap): Bitmap?{
+        return when {
             filmResource != null && filmResource != -1 -> {
-                val ffmpeg = FFMpegHaldCLUT(context)
-                ffmpeg.process(filmResource!!, "$filmLabel", file){ filteredFile, error ->
-                    if(error != null){
-                        //todo - handle
-                        println("error: $error")
-                    }else{
-                        if(filteredFile != null){
-                            resize(filteredFile)
-                        }else{
-                            //todo - handle
-                            println("error: hald clut file is null")
-                        }
-                    }
-                }
+                toolkit.loadLut(context, Lut(filmLabel!!, filmResource!!, false))
+                val filtered = toolkit.process(source)
+                source.recycle()
+                filtered
             }
-            else -> resize(file)
+            else -> source
         }
     }
 
@@ -98,24 +96,37 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
         when {
             doDesqueeze -> {
                 desqueeze(file, scaleFactor, useNativeToolkit) { desqueezedBitmap ->
-                    exportImage(desqueezedBitmap){ uri, error ->
+                    createCapturePreview(desqueezedBitmap)
+                    val filtered = applyLut(desqueezedBitmap)
+                    exportImage(filtered){ uri, error ->
                         when {
                             error != null -> errorStateFlow.value = "Lento save capture error: $error"
-                            else -> generatePreview(uri, desqueezedBitmap)
+                            else -> generatePreview(uri, filtered!!)//todo - add null check
                         }
                     }
                 }
             }
             else -> {
                 val bitmap = BitmapFactory.decodeStream(file.inputStream())
-                exportImage(bitmap){ uri, error ->
+                createCapturePreview(bitmap)
+                val filtered = applyLut(bitmap)
+                exportImage(filtered){ uri, error ->
                     when {
                         error != null -> errorStateFlow.value = "Lento save capture error: $error"
-                        else -> generatePreview(uri, bitmap)
+                        else -> generatePreview(uri, filtered!!)//todo - add null check
                     }
                 }
             }
         }
+    }
+
+    private fun createCapturePreview(bitmap: Bitmap){
+        val captureWidth = bitmap.width
+        val captureHeight = bitmap.height
+
+        val height = captureHeight/(captureWidth/200)
+        val capturePreviewBitmap = Bitmap.createScaledBitmap(bitmap, 200, height, true)
+        capturePreviewStateFlow.value = capturePreviewBitmap
     }
 
     //4. Build small preview
@@ -125,14 +136,24 @@ class AnamorphicPhotoProcessor(val context: Context, private val lifecycleScope:
             return
         }
         println("Lento save capture uri: $uri")
-        //todo - create smaller image with correct ratio...
-        val previewBitmap = Bitmap.createScaledBitmap(bitmap, 200, 100, true)
-        exportedPreviewStateFlow.value = Pair(uri, previewBitmap)
+        val filteredWidth = bitmap.width
+        val filteredHeight = bitmap.height
+
+        val height = filteredHeight/(filteredWidth/200)
+        val previewBitmap = Bitmap.createScaledBitmap(bitmap, 200, height, true)
+        val rounded = RoundedBitmapDrawableFactory.create(context.resources, previewBitmap)
+        rounded.isCircular = true
+        exportedPreviewStateFlow.value = Pair(uri, rounded)
 
         bitmap.recycle()
     }
 
-    private fun exportImage(image: Bitmap, onExported: (uri: Uri?, error: String?) -> Unit){
+    private fun exportImage(image: Bitmap?, onExported: (uri: Uri?, error: String?) -> Unit){
+
+        if(image == null) {
+            onExported(null, "Null Bitmap - did LUT process fail?")
+            return
+        }
 
         val values = ContentValues()
 

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.ImageCapture
 import androidx.preference.PreferenceManager
+import orllewin.lento.lut.Lut
 
 class CameraConfig(
     var isFirstRun: Boolean = true,
@@ -109,6 +110,12 @@ class CameraConfig(
     fun setLut(context: Context, lutResource: Int?, lutLabel: String){
         this.lutResource = lutResource ?: -1
         this.lutLabel = lutLabel
+        put(context, this)
+    }
+
+    fun setUnrealLut(context: Context, lut: Lut){
+        this.lutResource = lut.resourceId
+        this.lutLabel = lut.label
         put(context, this)
     }
 

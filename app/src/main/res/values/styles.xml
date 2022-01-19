@@ -7,6 +7,8 @@
         <item name="textAllCaps">false</item>
         <item name="android:background">#000000</item>
         <item name="android:textColor">#ffffff</item>
+        <item name="windowMinWidthMajor">80%</item>
+        <item name="windowMinWidthMinor">80%</item>
         <item name="shapeAppearanceOverlay">@style/round_corners</item>
 
     </style>

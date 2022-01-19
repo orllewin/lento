@@ -2,7 +2,6 @@ package orllewin.lento
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.SharedPreferences
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -31,7 +30,7 @@ import orllewin.extensions.*
 import orllewin.file_io.CameraIO
 import orllewin.file_io.OppenFileIO
 import orllewin.lento.databinding.ActivityMainBinding
-import java.io.File
+import orllewin.lento.lut.PreviewBitmapHolder
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -104,10 +103,16 @@ class MainActivity : AppCompatActivity() {
                         preview?.let {
                             mainThread {
                                 uri = preview.first
-                                binding.previewImage.setImageBitmap(preview.second)
+                                binding.previewImage.setImageDrawable(preview.second)
                                 binding.previewProgress.hide()
                             }
                         }
+                    }
+                }
+
+                launch{
+                    imageProcessor.capturePreviewStateFlow.asStateFlow().collect{ capturePreview ->
+                        PreviewBitmapHolder.preview = capturePreview
                     }
                 }
 
@@ -183,8 +188,8 @@ class MainActivity : AppCompatActivity() {
 
         updateLutModel()
         binding.filmLayout.setOnClickListener {
-            FilmSelectionDialog(this){ resId, label ->
-                config.setLut(this, resId, label ?: "")
+            FilmSelectionDialog2(this, PreviewBitmapHolder.preview){ lut ->
+                config.setUnrealLut(this, lut)
                 updateLutModel()
             }.show()
         }
@@ -194,7 +199,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.aspectRatioLayout.setOnClickListener { toggleAspectRatio() }
 
-        binding.previewImageCard.setOnClickListener {
+        binding.previewImage.setOnClickListener {
             Intent().run {
                 action = Intent.ACTION_VIEW
                 setDataAndType(uri, "image/*")

@@ -65,5 +65,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-perf'
 
+    implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
+
 
 }
