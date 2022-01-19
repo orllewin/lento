@@ -51,7 +51,6 @@ dependencies {
 
     implementation project(path: ':modules:extensions')
     implementation project(path: ':modules:file_io')
-    implementation project(path: ':modules:haldclut')
     implementation project(path: ':modules:skiss')
     implementation project(path: ':modules:renderscript_toolkit')
 

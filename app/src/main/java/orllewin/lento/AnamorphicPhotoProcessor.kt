@@ -14,10 +14,7 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawable
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.renderscript.Toolkit
-import jp.co.cyberagent.android.gpuimage.GPUImage
-import jp.co.cyberagent.android.gpuimage.filter.GPUImageLookupFilter
 import kotlinx.coroutines.flow.MutableStateFlow
-import orllewin.haldclut.FFMpegHaldCLUT
 import orllewin.lento.lut.Lut
 import orllewin.lento.lut.UnrealLutToolkit
 import java.io.File
