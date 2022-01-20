@@ -2,12 +2,18 @@
 
     <string-array name="all_luts">
         <item>:Monochrome</item>
+        <item>orl_legacy_mono_alpha</item>
+        <item>orl_legacy_mono_alpha_hi_key</item>
+        <item>orl_legacy_mono_portrait</item>
         <item>orl_mono_premium</item>
         <item>orl_mono_crisp</item>
         <item>orl_mono_standard</item>
         <item>orl_mono_standard_alt</item>
         <item>orl_mono_portrait</item>
         <item>:Colour</item>
+        <item>orl_legacy_colour_alpha</item>
+        <item>orl_legacy_colour_alpha_hi_key</item>
+        <item>orl_colour_warm_vivd</item>
         <item>orl_colour_standard</item>
         <item>orl_colour_80s</item>
         <item>orl_colour_blue_high</item>

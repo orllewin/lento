@@ -1,6 +1,7 @@
 package orllewin.lento
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.ImageCapture
 import androidx.preference.PreferenceManager
@@ -33,10 +34,10 @@ class CameraConfig(
     )
 
     companion object {
-        //inline fun build(block: Builder.() -> Unit) = Builder().apply(block).build()
 
+        const val prefsFilename = "lento_prevs_v2"
         fun put(context: Context, config: CameraConfig){
-            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+            val prefs = context.getSharedPreferences(prefsFilename, Context.MODE_PRIVATE)
             val editor = prefs.edit()
             editor.putBoolean("isFirstRun", config.isFirstRun)
             editor.putBoolean("isAnamorphic", config.isAnamorphic)
@@ -52,7 +53,7 @@ class CameraConfig(
         }
 
         fun get(context: Context): CameraConfig{
-            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+            val prefs = context.getSharedPreferences(prefsFilename, Context.MODE_PRIVATE)
             val builder = Builder()
             builder.isFirstRun = prefs.getBoolean("isFirstRun", true)
             builder.isAnamorphic = prefs.getBoolean("isAnamorphic", false)
